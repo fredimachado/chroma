@@ -2,7 +2,7 @@ import QtQuick
 
 Rectangle {
     id: page
-    color: Palette.background
+    color: Theme.background
 
     readonly property int ruleWidth: 2
     readonly property int radius: 0
@@ -15,7 +15,7 @@ Rectangle {
         { title: "Hook ping dropped", body: "chroma.sock was missing. Stamp file used instead.", stamp: "09:18", status: "failed" },
         { title: "Wallpaper swapped", body: "background symlink now points at winding-road.", stamp: "09:21", status: "ready" },
         { title: "Font refresh queued", body: "JetBrainsMono Nerd Font still matches fc-match.", stamp: "09:24", status: "pending" },
-        { title: "Accent preview", body: "Studio hero should track Palette.accent live.", stamp: "09:30", status: "ready" }
+        { title: "Accent preview", body: "Studio hero should track Theme.accent live.", stamp: "09:30", status: "ready" }
     ]
 
     readonly property var logs: [
@@ -27,10 +27,10 @@ Rectangle {
 
     function badgeColor(status) {
         if (status === "failed")
-            return Palette.red
+            return Theme.red
         if (status === "pending")
-            return Palette.yellow
-        return Palette.green
+            return Theme.yellow
+        return Theme.green
     }
 
     function badgeLabel(status) {
@@ -48,7 +48,7 @@ Rectangle {
         Rectangle {
             width: page.sidebarWidth
             height: parent.height
-            color: Palette.darkBackground
+            color: Theme.darkBackground
 
             Column {
                 anchors.fill: parent
@@ -57,7 +57,7 @@ Rectangle {
 
                 Text {
                     text: "MAIL"
-                    color: Palette.muted
+                    color: Theme.muted
                     font.pixelSize: 11
                     font.letterSpacing: 2
                     font.bold: true
@@ -71,7 +71,7 @@ Rectangle {
                         required property string modelData
                         width: parent.width
                         height: 32
-                        color: index === 0 ? Palette.selection : "transparent"
+                        color: index === 0 ? Theme.selection : "transparent"
                         radius: page.radius
 
                         Text {
@@ -79,7 +79,7 @@ Rectangle {
                             anchors.left: parent.left
                             anchors.leftMargin: 10
                             text: modelData
-                            color: index === 0 ? Palette.accent : Palette.foreground
+                            color: index === 0 ? Theme.accent : Theme.foreground
                             font.pixelSize: 13
                         }
 
@@ -88,7 +88,7 @@ Rectangle {
                             anchors.right: parent.right
                             anchors.rightMargin: 10
                             text: index === 0 ? String(page.inbox.length) : "0"
-                            color: Palette.muted
+                            color: Theme.muted
                             font.family: "JetBrainsMono Nerd Font"
                             font.pixelSize: 12
                         }
@@ -99,22 +99,22 @@ Rectangle {
 
                 Text {
                     text: "STATUS"
-                    color: Palette.muted
+                    color: Theme.muted
                     font.pixelSize: 11
                     font.letterSpacing: 2
                     font.bold: true
                 }
 
-                Text { text: "Failed"; color: Palette.red; font.pixelSize: 13 }
-                Text { text: "Ready"; color: Palette.green; font.pixelSize: 13 }
-                Text { text: "Pending"; color: Palette.yellow; font.pixelSize: 13 }
+                Text { text: "Failed"; color: Theme.red; font.pixelSize: 13 }
+                Text { text: "Ready"; color: Theme.green; font.pixelSize: 13 }
+                Text { text: "Pending"; color: Theme.yellow; font.pixelSize: 13 }
             }
         }
 
         Rectangle {
             width: page.ruleWidth
             height: parent.height
-            color: Palette.muted
+            color: Theme.muted
         }
 
         Item {
@@ -128,7 +128,7 @@ Rectangle {
 
                 Text {
                     text: "SURFACES"
-                    color: Palette.muted
+                    color: Theme.muted
                     font.pixelSize: 12
                     font.letterSpacing: 2
                     font.bold: true
@@ -142,10 +142,10 @@ Rectangle {
                     Rectangle {
                         width: 280
                         height: parent.height
-                        color: Palette.darkerBackground
+                        color: Theme.darkerBackground
                         radius: page.radius
                         border.width: 1
-                        border.color: Palette.muted
+                        border.color: Theme.muted
 
                         Column {
                             anchors.fill: parent
@@ -160,7 +160,7 @@ Rectangle {
                                     required property var modelData
                                     width: parent.width
                                     height: 64
-                                    color: page.selectedIndex === index ? Palette.selection : "transparent"
+                                    color: page.selectedIndex === index ? Theme.selection : "transparent"
                                     radius: page.radius
 
                                     Column {
@@ -177,7 +177,7 @@ Rectangle {
 
                                             Text {
                                                 text: modelData.title
-                                                color: Palette.foreground
+                                                color: Theme.foreground
                                                 font.pixelSize: 13
                                                 elide: Text.ElideRight
                                                 width: parent.width - 70
@@ -185,7 +185,7 @@ Rectangle {
 
                                             Text {
                                                 text: modelData.stamp
-                                                color: Palette.muted
+                                                color: Theme.muted
                                                 font.family: "JetBrainsMono Nerd Font"
                                                 font.pixelSize: 11
                                             }
@@ -193,7 +193,7 @@ Rectangle {
 
                                         Text {
                                             text: modelData.body
-                                            color: Palette.darkForeground
+                                            color: Theme.darkForeground
                                             font.pixelSize: 11
                                             elide: Text.ElideRight
                                             width: parent.width
@@ -212,10 +212,10 @@ Rectangle {
                     Rectangle {
                         width: parent.width - 296
                         height: parent.height
-                        color: Palette.lighterBackground
+                        color: Theme.lighterBackground
                         radius: page.radius
                         border.width: 1
-                        border.color: Palette.muted
+                        border.color: Theme.muted
 
                         Column {
                             anchors.fill: parent
@@ -234,7 +234,7 @@ Rectangle {
                                     Text {
                                         anchors.centerIn: parent
                                         text: page.badgeLabel(page.inbox[page.selectedIndex].status)
-                                        color: Palette.darkerBackground
+                                        color: Theme.darkerBackground
                                         font.pixelSize: 11
                                         font.bold: true
                                     }
@@ -242,7 +242,7 @@ Rectangle {
 
                                 Text {
                                     text: page.inbox[page.selectedIndex].stamp
-                                    color: Palette.muted
+                                    color: Theme.muted
                                     font.family: "JetBrainsMono Nerd Font"
                                     font.pixelSize: 12
                                     anchors.verticalCenter: parent.verticalCenter
@@ -251,20 +251,20 @@ Rectangle {
 
                             Text {
                                 text: page.inbox[page.selectedIndex].title
-                                color: Palette.brightForeground
+                                color: Theme.brightForeground
                                 font.pixelSize: 22
                             }
 
                             Rectangle {
                                 width: parent.width
                                 height: page.ruleWidth
-                                color: Palette.accent
+                                color: Theme.accent
                             }
 
                             Text {
                                 width: parent.width
                                 text: page.inbox[page.selectedIndex].body
-                                color: Palette.foreground
+                                color: Theme.foreground
                                 font.pixelSize: 14
                                 wrapMode: Text.WordWrap
                             }
@@ -272,9 +272,9 @@ Rectangle {
                             Rectangle {
                                 width: parent.width
                                 height: 36
-                                color: Palette.background
+                                color: Theme.background
                                 border.width: 1
-                                border.color: Palette.muted
+                                border.color: Theme.muted
                                 radius: page.radius
 
                                 Text {
@@ -282,7 +282,7 @@ Rectangle {
                                     anchors.left: parent.left
                                     anchors.leftMargin: 10
                                     text: "Reply to this event…"
-                                    color: Palette.muted
+                                    color: Theme.muted
                                     font.pixelSize: 13
                                 }
                             }
@@ -293,10 +293,10 @@ Rectangle {
                 Rectangle {
                     width: parent.width
                     height: 168
-                    color: Palette.darkBackground
+                    color: Theme.darkBackground
                     radius: page.radius
                     border.width: 1
-                    border.color: Palette.muted
+                    border.color: Theme.muted
 
                     Column {
                         anchors.fill: parent
@@ -305,7 +305,7 @@ Rectangle {
 
                         Text {
                             text: "EVENT LOG"
-                            color: Palette.muted
+                            color: Theme.muted
                             font.pixelSize: 11
                             font.letterSpacing: 1.5
                             font.bold: true
@@ -322,15 +322,15 @@ Rectangle {
                                     width: 8
                                     height: 8
                                     anchors.verticalCenter: parent.verticalCenter
-                                    color: modelData.tone === "green" ? Palette.green
-                                         : modelData.tone === "yellow" ? Palette.yellow
-                                         : modelData.tone === "red" ? Palette.red
-                                         : Palette.muted
+                                    color: modelData.tone === "green" ? Theme.green
+                                         : modelData.tone === "yellow" ? Theme.yellow
+                                         : modelData.tone === "red" ? Theme.red
+                                         : Theme.muted
                                 }
 
                                 Text {
                                     text: modelData.line
-                                    color: Palette.foreground
+                                    color: Theme.foreground
                                     font.family: "JetBrainsMono Nerd Font"
                                     font.pixelSize: 12
                                 }

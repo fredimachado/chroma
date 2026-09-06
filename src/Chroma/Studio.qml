@@ -1,7 +1,7 @@
 import QtQuick
 
 Rectangle {
-    color: Palette.background
+    color: Theme.background
 
     readonly property int ruleWidth: 2
     readonly property int radius: 0
@@ -16,7 +16,7 @@ Rectangle {
 
             Text {
                 text: "STUDIO"
-                color: Palette.muted
+                color: Theme.muted
                 font.pixelSize: 12
                 font.letterSpacing: 2
                 font.bold: true
@@ -24,14 +24,14 @@ Rectangle {
 
             Text {
                 text: App.themeName.length > 0 ? App.themeName : "unnamed theme"
-                color: Palette.foreground
+                color: Theme.foreground
                 font.pixelSize: 36
                 font.bold: true
             }
 
             Text {
-                text: Palette.mode
-                color: Palette.accent
+                text: Theme.mode
+                color: Theme.accent
                 font.pixelSize: 14
                 font.family: "JetBrainsMono Nerd Font"
             }
@@ -40,7 +40,7 @@ Rectangle {
         Rectangle {
             width: parent.width
             height: ruleWidth
-            color: Palette.accent
+            color: Theme.accent
         }
 
         Row {
@@ -49,13 +49,13 @@ Rectangle {
             Rectangle {
                 width: 160
                 height: 160
-                color: Palette.accent
+                color: Theme.accent
                 radius: 0
 
                 Text {
                     anchors.centerIn: parent
                     text: "accent"
-                    color: Palette.darkerBackground
+                    color: Theme.darkerBackground
                     font.pixelSize: 13
                     font.family: "JetBrainsMono Nerd Font"
                 }
@@ -69,13 +69,13 @@ Rectangle {
                     spacing: 4
                     Text {
                         text: "WALLPAPER"
-                        color: Palette.muted
+                        color: Theme.muted
                         font.pixelSize: 11
                         font.letterSpacing: 1.5
                     }
                     Text {
                         text: App.wallpaperPath.length > 0 ? App.wallpaperPath : "none"
-                        color: Palette.darkForeground
+                        color: Theme.darkForeground
                         font.pixelSize: 13
                         font.family: "JetBrainsMono Nerd Font"
                         wrapMode: Text.WrapAnywhere
@@ -87,13 +87,13 @@ Rectangle {
                     spacing: 4
                     Text {
                         text: "LAST RELOAD"
-                        color: Palette.muted
+                        color: Theme.muted
                         font.pixelSize: 11
                         font.letterSpacing: 1.5
                     }
                     Text {
-                        text: Palette.lastReloaded.length > 0 ? Palette.lastReloaded : "not yet"
-                        color: Palette.foreground
+                        text: Theme.lastReloaded.length > 0 ? Theme.lastReloaded : "not yet"
+                        color: Theme.foreground
                         font.pixelSize: 13
                         font.family: "JetBrainsMono Nerd Font"
                     }
@@ -103,13 +103,13 @@ Rectangle {
                     spacing: 4
                     Text {
                         text: "MODE"
-                        color: Palette.muted
+                        color: Theme.muted
                         font.pixelSize: 11
                         font.letterSpacing: 1.5
                     }
                     Text {
-                        text: Palette.mode
-                        color: Palette.brightForeground
+                        text: Theme.mode
+                        color: Theme.brightForeground
                         font.pixelSize: 13
                     }
                 }

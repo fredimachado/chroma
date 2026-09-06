@@ -1,7 +1,7 @@
 import QtQuick
 
 Rectangle {
-    color: Palette.background
+    color: Theme.background
 
     readonly property int ruleWidth: 2
     readonly property int radius: 0
@@ -17,7 +17,7 @@ Rectangle {
 
             Text {
                 text: "PALETTE"
-                color: Palette.muted
+                color: Theme.muted
                 font.pixelSize: 12
                 font.letterSpacing: 2
                 font.bold: true
@@ -25,8 +25,8 @@ Rectangle {
             }
 
             Text {
-                text: Palette.tokens.length + " tokens"
-                color: Palette.darkForeground
+                text: Theme.tokens.length + " tokens"
+                color: Theme.darkForeground
                 font.pixelSize: 12
                 font.family: "JetBrainsMono Nerd Font"
                 anchors.verticalCenter: parent.verticalCenter
@@ -34,7 +34,7 @@ Rectangle {
 
             Text {
                 text: "click a row to copy"
-                color: Palette.muted
+                color: Theme.muted
                 font.pixelSize: 12
                 anchors.verticalCenter: parent.verticalCenter
             }
@@ -43,7 +43,7 @@ Rectangle {
         Rectangle {
             width: parent.width
             height: ruleWidth
-            color: Palette.accent
+            color: Theme.accent
         }
 
         Flickable {
@@ -59,13 +59,13 @@ Rectangle {
                 spacing: 2
 
                 Repeater {
-                    model: Palette.tokens
+                    model: Theme.tokens
 
                     Rectangle {
                         required property var item
                         width: tokenColumn.width
                         height: 52
-                        color: rowArea.containsMouse ? Palette.lighterBackground : Palette.darkBackground
+                        color: rowArea.containsMouse ? Theme.lighterBackground : Theme.darkBackground
                         radius: 0
 
                         Row {
@@ -81,14 +81,14 @@ Rectangle {
                                 color: item.hex
                                 radius: 0
                                 border.width: 1
-                                border.color: Palette.muted
+                                border.color: Theme.muted
                             }
 
                             Text {
                                 width: 200
                                 anchors.verticalCenter: parent.verticalCenter
                                 text: item.key
-                                color: Palette.foreground
+                                color: Theme.foreground
                                 font.family: "JetBrainsMono Nerd Font"
                                 font.pixelSize: 13
                             }
@@ -97,7 +97,7 @@ Rectangle {
                                 width: 110
                                 anchors.verticalCenter: parent.verticalCenter
                                 text: item.hex
-                                color: Palette.muted
+                                color: Theme.muted
                                 font.family: "JetBrainsMono Nerd Font"
                                 font.pixelSize: 13
                             }
@@ -105,7 +105,7 @@ Rectangle {
                             Text {
                                 anchors.verticalCenter: parent.verticalCenter
                                 text: Number(item.luminance).toFixed(3)
-                                color: Palette.darkForeground
+                                color: Theme.darkForeground
                                 font.family: "JetBrainsMono Nerd Font"
                                 font.pixelSize: 13
                             }

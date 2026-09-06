@@ -57,7 +57,7 @@ public sealed class Swatch : INotifyPropertyChanged
 }
 
 [QObject]
-[QmlElement(Name = "Palette", Singleton = true)]
+[QmlElement(Name = "Theme", Singleton = true)]
 public sealed class Palette : INotifyPropertyChanged
 {
     static readonly SemanticColor[] Keys = Enum.GetValues<SemanticColor>();

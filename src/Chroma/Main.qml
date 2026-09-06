@@ -9,7 +9,7 @@ Window {
     height: 720
     minimumWidth: 880
     minimumHeight: 560
-    color: Palette.background
+    color: Theme.background
 
     readonly property int ruleWidth: 2
     readonly property int radius: 0
@@ -32,7 +32,7 @@ Window {
         anchors.left: parent.left
         anchors.right: parent.right
         height: root.ruleWidth
-        color: Palette.accent
+        color: Theme.accent
     }
 
     Row {
@@ -46,7 +46,7 @@ Window {
             id: nav
             width: root.navWidth
             height: parent.height
-            color: Palette.darkBackground
+            color: Theme.darkBackground
 
             Column {
                 anchors.fill: parent
@@ -57,7 +57,7 @@ Window {
 
                 Text {
                     text: "CHROMA"
-                    color: Palette.accent
+                    color: Theme.accent
                     font.pixelSize: 12
                     font.letterSpacing: 2
                     font.bold: true
@@ -65,7 +65,7 @@ Window {
 
                 Text {
                     text: App.themeName.length > 0 ? App.themeName : "no theme"
-                    color: Palette.muted
+                    color: Theme.muted
                     font.pixelSize: 12
                     elide: Text.ElideRight
                     width: parent.width
@@ -80,13 +80,13 @@ Window {
                         required property var modelData
                         width: parent.width
                         height: 36
-                        color: App.page === modelData.page ? Palette.selection : "transparent"
+                        color: App.page === modelData.page ? Theme.selection : "transparent"
                         radius: root.radius
 
                         Rectangle {
                             width: root.ruleWidth
                             height: parent.height
-                            color: App.page === modelData.page ? Palette.accent : "transparent"
+                            color: App.page === modelData.page ? Theme.accent : "transparent"
                         }
 
                         Text {
@@ -94,7 +94,7 @@ Window {
                             anchors.left: parent.left
                             anchors.leftMargin: 14
                             text: modelData.label
-                            color: App.page === modelData.page ? Palette.accent : Palette.foreground
+                            color: App.page === modelData.page ? Theme.accent : Theme.foreground
                             font.pixelSize: 14
                         }
 
@@ -111,7 +111,7 @@ Window {
         Rectangle {
             width: root.ruleWidth
             height: parent.height
-            color: Palette.muted
+            color: Theme.muted
         }
 
         Loader {

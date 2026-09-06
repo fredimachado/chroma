@@ -1,7 +1,7 @@
 import QtQuick
 
 Rectangle {
-    color: Palette.background
+    color: Theme.background
 
     readonly property int ruleWidth: 2
     readonly property int radius: 0
@@ -13,7 +13,7 @@ Rectangle {
 
         Text {
             text: "SESSION"
-            color: Palette.muted
+            color: Theme.muted
             font.pixelSize: 12
             font.letterSpacing: 2
             font.bold: true
@@ -21,14 +21,14 @@ Rectangle {
 
         Text {
             text: App.hookInstalled ? "theme-set hook installed" : "hook missing"
-            color: App.hookInstalled ? Palette.green : Palette.yellow
+            color: App.hookInstalled ? Theme.green : Theme.yellow
             font.pixelSize: 22
         }
 
         Rectangle {
             width: parent.width
             height: ruleWidth
-            color: Palette.accent
+            color: Theme.accent
         }
 
         Repeater {
@@ -46,14 +46,14 @@ Rectangle {
 
                 Text {
                     text: modelData.label.toUpperCase()
-                    color: Palette.muted
+                    color: Theme.muted
                     font.pixelSize: 11
                     font.letterSpacing: 1.5
                 }
 
                 Text {
                     text: modelData.value.length > 0 ? modelData.value : "-"
-                    color: Palette.foreground
+                    color: Theme.foreground
                     font.family: "JetBrainsMono Nerd Font"
                     font.pixelSize: 13
                     wrapMode: Text.WrapAnywhere
@@ -66,7 +66,7 @@ Rectangle {
             visible: App.lastError.length > 0
             width: parent.width
             text: App.lastError
-            color: Palette.red
+            color: Theme.red
             font.family: "JetBrainsMono Nerd Font"
             font.pixelSize: 13
             wrapMode: Text.WordWrap
@@ -78,13 +78,13 @@ Rectangle {
             Rectangle {
                 width: 140
                 height: 36
-                color: Palette.accent
+                color: Theme.accent
                 radius: 0
 
                 Text {
                     anchors.centerIn: parent
                     text: "Install hook"
-                    color: Palette.darkerBackground
+                    color: Theme.darkerBackground
                     font.pixelSize: 13
                     font.bold: true
                 }
@@ -99,15 +99,15 @@ Rectangle {
             Rectangle {
                 width: 120
                 height: 36
-                color: Palette.lighterBackground
+                color: Theme.lighterBackground
                 border.width: 1
-                border.color: Palette.muted
+                border.color: Theme.muted
                 radius: 0
 
                 Text {
                     anchors.centerIn: parent
                     text: "Reload"
-                    color: Palette.foreground
+                    color: Theme.foreground
                     font.pixelSize: 13
                 }
 
@@ -115,7 +115,7 @@ Rectangle {
                     anchors.fill: parent
                     cursorShape: Qt.PointingHandCursor
                     onClicked: {
-                        Palette.reload()
+                        Theme.reload()
                         App.refreshSession()
                     }
                 }
