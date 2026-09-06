@@ -19,7 +19,12 @@ Window {
     readonly property int pageSurfaces: 2
     readonly property int pageType: 3
     readonly property int pageTerm: 4
-    readonly property int pageSession: 5
+    readonly property int pageControls: 5
+    readonly property int pageWall: 6
+    readonly property int pageKeys: 7
+    readonly property int pageNotify: 8
+    readonly property int pageEditor: 9
+    readonly property int pageSession: 10
 
     readonly property var pages: [
         { page: root.pageStudio, label: "Studio" },
@@ -27,6 +32,11 @@ Window {
         { page: root.pageSurfaces, label: "Surfaces" },
         { page: root.pageType, label: "Type" },
         { page: root.pageTerm, label: "Term" },
+        { page: root.pageControls, label: "Controls" },
+        { page: root.pageWall, label: "Wall" },
+        { page: root.pageKeys, label: "Keys" },
+        { page: root.pageNotify, label: "Notify" },
+        { page: root.pageEditor, label: "Editor" },
         { page: root.pageSession, label: "Session" }
     ]
 
@@ -132,6 +142,16 @@ Window {
                     return typePage
                 if (App.page === root.pageTerm)
                     return termPage
+                if (App.page === root.pageControls)
+                    return controlsPage
+                if (App.page === root.pageWall)
+                    return wallPage
+                if (App.page === root.pageKeys)
+                    return keysPage
+                if (App.page === root.pageNotify)
+                    return notifyPage
+                if (App.page === root.pageEditor)
+                    return editorPage
                 if (App.page === root.pageSession)
                     return sessionPage
                 return sessionPage
@@ -144,5 +164,10 @@ Window {
     Component { id: surfacesPage; Surfaces {} }
     Component { id: typePage; Type {} }
     Component { id: termPage; Term {} }
+    Component { id: controlsPage; Controls {} }
+    Component { id: wallPage; Wall {} }
+    Component { id: keysPage; Keys {} }
+    Component { id: notifyPage; Notify {} }
+    Component { id: editorPage; Editor {} }
     Component { id: sessionPage; Session {} }
 }

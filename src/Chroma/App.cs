@@ -16,6 +16,11 @@ public sealed class App : INotifyPropertyChanged
         Surfaces,
         Type,
         Term,
+        Controls,
+        Wall,
+        Keys,
+        Notify,
+        Editor,
         Session,
     }
 

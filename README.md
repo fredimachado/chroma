@@ -6,7 +6,7 @@ Chroma is the vehicle: a live theme studio. It reads `omarchy-theme-color --all`
 
 ![Chroma Studio on Tokyo Night](docs/chroma.png)
 
-Six pages share one `App.Page` nav: Studio, Palette, Surfaces, Type, Term, Session.
+Eleven pages share one `App.Page` nav: Studio, Palette, Surfaces, Type, Term, Controls, Wall, Keys, Notify, Editor, Session.
 
 Hyprland keeps the 2px SSD border. The client draws a matching 2px accent rule. The window is a headerless `Window`, not an `ApplicationWindow`.
 
