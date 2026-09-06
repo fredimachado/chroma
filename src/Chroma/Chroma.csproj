@@ -50,7 +50,7 @@
     <None Include="Term.qml" />
     <None Include="Controls.qml" />
     <None Include="Wall.qml" />
-    <None Include="Keys.qml" />
+    <None Include="Keybinds.qml" />
     <None Include="Notify.qml" />
     <None Include="Editor.qml" />
     <None Include="Session.qml" />

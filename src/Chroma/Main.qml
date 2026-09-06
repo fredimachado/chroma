@@ -166,7 +166,7 @@ Window {
     Component { id: termPage; Term {} }
     Component { id: controlsPage; Controls {} }
     Component { id: wallPage; Wall {} }
-    Component { id: keysPage; Keys {} }
+    Component { id: keysPage; Keybinds {} }
     Component { id: notifyPage; Notify {} }
     Component { id: editorPage; Editor {} }
     Component { id: sessionPage; Session {} }
