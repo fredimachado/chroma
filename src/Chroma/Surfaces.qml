@@ -1,4 +1,5 @@
 import QtQuick
+import QtQuick.Layouts
 
 Rectangle {
     id: page
@@ -41,13 +42,14 @@ Rectangle {
         return "Ready"
     }
 
-    Row {
+    RowLayout {
         anchors.fill: parent
         spacing: 0
 
         Rectangle {
-            width: page.sidebarWidth
-            height: parent.height
+            Layout.preferredWidth: page.sidebarWidth
+            Layout.minimumWidth: 160
+            Layout.fillHeight: true
             color: Theme.darkBackground
 
             Column {
@@ -112,178 +114,96 @@ Rectangle {
         }
 
         Rectangle {
-            width: page.ruleWidth
-            height: parent.height
+            Layout.preferredWidth: page.ruleWidth
+            Layout.fillHeight: true
             color: Theme.muted
         }
 
-        Item {
-            width: parent.width - page.sidebarWidth - page.ruleWidth
-            height: parent.height
+        ColumnLayout {
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            Layout.margins: 20
+            spacing: 16
 
-            Column {
-                anchors.fill: parent
-                anchors.margins: 20
+            Text {
+                text: "SURFACES"
+                color: Theme.muted
+                font.pixelSize: 12
+                font.letterSpacing: 2
+                font.bold: true
+            }
+
+            RowLayout {
+                Layout.fillWidth: true
+                Layout.fillHeight: true
                 spacing: 16
 
-                Text {
-                    text: "SURFACES"
-                    color: Theme.muted
-                    font.pixelSize: 12
-                    font.letterSpacing: 2
-                    font.bold: true
-                }
+                Rectangle {
+                    Layout.preferredWidth: 280
+                    Layout.minimumWidth: 180
+                    Layout.fillHeight: true
+                    color: Theme.darkerBackground
+                    radius: page.radius
+                    border.width: 1
+                    border.color: Theme.muted
+                    clip: true
 
-                Row {
-                    width: parent.width
-                    height: parent.height - 220
-                    spacing: 16
+                    Column {
+                        anchors.fill: parent
+                        anchors.margins: 8
+                        spacing: 4
 
-                    Rectangle {
-                        width: 280
-                        height: parent.height
-                        color: Theme.darkerBackground
-                        radius: page.radius
-                        border.width: 1
-                        border.color: Theme.muted
+                        Repeater {
+                            model: page.inbox
 
-                        Column {
-                            anchors.fill: parent
-                            anchors.margins: 8
-                            spacing: 4
+                            Rectangle {
+                                required property int index
+                                required property var modelData
+                                width: parent.width
+                                height: 64
+                                color: page.selectedIndex === index ? Theme.selection : "transparent"
+                                radius: page.radius
 
-                            Repeater {
-                                model: page.inbox
+                                Column {
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    anchors.left: parent.left
+                                    anchors.right: parent.right
+                                    anchors.leftMargin: 10
+                                    anchors.rightMargin: 10
+                                    spacing: 4
 
-                                Rectangle {
-                                    required property int index
-                                    required property var modelData
-                                    width: parent.width
-                                    height: 64
-                                    color: page.selectedIndex === index ? Theme.selection : "transparent"
-                                    radius: page.radius
+                                    Row {
+                                        width: parent.width
+                                        spacing: 8
 
-                                    Column {
-                                        anchors.verticalCenter: parent.verticalCenter
-                                        anchors.left: parent.left
-                                        anchors.right: parent.right
-                                        anchors.leftMargin: 10
-                                        anchors.rightMargin: 10
-                                        spacing: 4
-
-                                        Row {
-                                            width: parent.width
-                                            spacing: 8
-
-                                            Text {
-                                                text: modelData.title
-                                                color: Theme.foreground
-                                                font.pixelSize: 13
-                                                elide: Text.ElideRight
-                                                width: parent.width - 70
-                                            }
-
-                                            Text {
-                                                text: modelData.stamp
-                                                color: Theme.muted
-                                                font.family: "JetBrainsMono Nerd Font"
-                                                font.pixelSize: 11
-                                            }
+                                        Text {
+                                            text: modelData.title
+                                            color: Theme.foreground
+                                            font.pixelSize: 13
+                                            elide: Text.ElideRight
+                                            width: parent.width - 70
                                         }
 
                                         Text {
-                                            text: modelData.body
-                                            color: Theme.darkForeground
+                                            text: modelData.stamp
+                                            color: Theme.muted
+                                            font.family: "JetBrainsMono Nerd Font"
                                             font.pixelSize: 11
-                                            elide: Text.ElideRight
-                                            width: parent.width
                                         }
                                     }
 
-                                    MouseArea {
-                                        anchors.fill: parent
-                                        onClicked: page.selectedIndex = index
-                                    }
-                                }
-                            }
-                        }
-                    }
-
-                    Rectangle {
-                        width: parent.width - 296
-                        height: parent.height
-                        color: Theme.lighterBackground
-                        radius: page.radius
-                        border.width: 1
-                        border.color: Theme.muted
-
-                        Column {
-                            anchors.fill: parent
-                            anchors.margins: 20
-                            spacing: 14
-
-                            Row {
-                                spacing: 10
-
-                                Rectangle {
-                                    width: 72
-                                    height: 22
-                                    color: page.badgeColor(page.inbox[page.selectedIndex].status)
-                                    radius: page.radius
-
                                     Text {
-                                        anchors.centerIn: parent
-                                        text: page.badgeLabel(page.inbox[page.selectedIndex].status)
-                                        color: Theme.darkerBackground
+                                        text: modelData.body
+                                        color: Theme.darkForeground
                                         font.pixelSize: 11
-                                        font.bold: true
+                                        elide: Text.ElideRight
+                                        width: parent.width
                                     }
                                 }
 
-                                Text {
-                                    text: page.inbox[page.selectedIndex].stamp
-                                    color: Theme.muted
-                                    font.family: "JetBrainsMono Nerd Font"
-                                    font.pixelSize: 12
-                                    anchors.verticalCenter: parent.verticalCenter
-                                }
-                            }
-
-                            Text {
-                                text: page.inbox[page.selectedIndex].title
-                                color: Theme.brightForeground
-                                font.pixelSize: 22
-                            }
-
-                            Rectangle {
-                                width: parent.width
-                                height: page.ruleWidth
-                                color: Theme.accent
-                            }
-
-                            Text {
-                                width: parent.width
-                                text: page.inbox[page.selectedIndex].body
-                                color: Theme.foreground
-                                font.pixelSize: 14
-                                wrapMode: Text.WordWrap
-                            }
-
-                            Rectangle {
-                                width: parent.width
-                                height: 36
-                                color: Theme.background
-                                border.width: 1
-                                border.color: Theme.muted
-                                radius: page.radius
-
-                                Text {
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    anchors.left: parent.left
-                                    anchors.leftMargin: 10
-                                    text: "Reply to this event…"
-                                    color: Theme.muted
-                                    font.pixelSize: 13
+                                MouseArea {
+                                    anchors.fill: parent
+                                    onClicked: page.selectedIndex = index
                                 }
                             }
                         }
@@ -291,49 +211,141 @@ Rectangle {
                 }
 
                 Rectangle {
-                    width: parent.width
-                    height: 168
-                    color: Theme.darkBackground
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    Layout.minimumWidth: 160
+                    color: Theme.lighterBackground
                     radius: page.radius
                     border.width: 1
                     border.color: Theme.muted
+                    clip: true
 
-                    Column {
+                    ColumnLayout {
                         anchors.fill: parent
-                        anchors.margins: 12
-                        spacing: 6
+                        anchors.margins: 20
+                        spacing: 14
 
-                        Text {
-                            text: "EVENT LOG"
-                            color: Theme.muted
-                            font.pixelSize: 11
-                            font.letterSpacing: 1.5
-                            font.bold: true
-                        }
+                        RowLayout {
+                            Layout.fillWidth: true
+                            spacing: 10
 
-                        Repeater {
-                            model: page.logs
-
-                            Row {
-                                required property var modelData
-                                spacing: 10
-
-                                Rectangle {
-                                    width: 8
-                                    height: 8
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    color: modelData.tone === "green" ? Theme.green
-                                         : modelData.tone === "yellow" ? Theme.yellow
-                                         : modelData.tone === "red" ? Theme.red
-                                         : Theme.muted
-                                }
+                            Rectangle {
+                                Layout.preferredWidth: 72
+                                Layout.preferredHeight: 22
+                                color: page.badgeColor(page.inbox[page.selectedIndex].status)
+                                radius: page.radius
 
                                 Text {
-                                    text: modelData.line
-                                    color: Theme.foreground
-                                    font.family: "JetBrainsMono Nerd Font"
-                                    font.pixelSize: 12
+                                    anchors.centerIn: parent
+                                    text: page.badgeLabel(page.inbox[page.selectedIndex].status)
+                                    color: Theme.darkerBackground
+                                    font.pixelSize: 11
+                                    font.bold: true
                                 }
+                            }
+
+                            Text {
+                                text: page.inbox[page.selectedIndex].stamp
+                                color: Theme.muted
+                                font.family: "JetBrainsMono Nerd Font"
+                                font.pixelSize: 12
+                                Layout.fillWidth: true
+                                elide: Text.ElideRight
+                            }
+                        }
+
+                        Text {
+                            Layout.fillWidth: true
+                            text: page.inbox[page.selectedIndex].title
+                            color: Theme.brightForeground
+                            font.pixelSize: 22
+                            wrapMode: Text.WordWrap
+                        }
+
+                        Rectangle {
+                            Layout.fillWidth: true
+                            Layout.preferredHeight: page.ruleWidth
+                            color: Theme.accent
+                        }
+
+                        Text {
+                            Layout.fillWidth: true
+                            text: page.inbox[page.selectedIndex].body
+                            color: Theme.foreground
+                            font.pixelSize: 14
+                            wrapMode: Text.WordWrap
+                        }
+
+                        Rectangle {
+                            Layout.fillWidth: true
+                            Layout.preferredHeight: 36
+                            color: Theme.background
+                            border.width: 1
+                            border.color: Theme.muted
+                            radius: page.radius
+
+                            Text {
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.right: parent.right
+                                anchors.leftMargin: 10
+                                anchors.rightMargin: 10
+                                text: "Reply to this event…"
+                                color: Theme.muted
+                                font.pixelSize: 13
+                                elide: Text.ElideRight
+                            }
+                        }
+                    }
+                }
+            }
+
+            Rectangle {
+                Layout.fillWidth: true
+                Layout.preferredHeight: 168
+                color: Theme.darkBackground
+                radius: page.radius
+                border.width: 1
+                border.color: Theme.muted
+                clip: true
+
+                ColumnLayout {
+                    anchors.fill: parent
+                    anchors.margins: 12
+                    spacing: 6
+
+                    Text {
+                        text: "EVENT LOG"
+                        color: Theme.muted
+                        font.pixelSize: 11
+                        font.letterSpacing: 1.5
+                        font.bold: true
+                    }
+
+                    Repeater {
+                        model: page.logs
+
+                        RowLayout {
+                            required property var modelData
+                            Layout.fillWidth: true
+                            spacing: 10
+
+                            Rectangle {
+                                Layout.preferredWidth: 8
+                                Layout.preferredHeight: 8
+                                color: modelData.tone === "green" ? Theme.green
+                                     : modelData.tone === "yellow" ? Theme.yellow
+                                     : modelData.tone === "red" ? Theme.red
+                                     : Theme.muted
+                            }
+
+                            Text {
+                                Layout.fillWidth: true
+                                text: modelData.line
+                                color: Theme.foreground
+                                font.family: "JetBrainsMono Nerd Font"
+                                font.pixelSize: 12
+                                elide: Text.ElideRight
                             }
                         }
                     }
