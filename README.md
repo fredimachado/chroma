@@ -1,8 +1,12 @@
 # Chroma
 
-Live Omarchy theme studio. Six pages: Studio, Palette, Surfaces, Type, Term, Session.
+Live Omarchy theme studio. Chroma reads `omarchy-theme-color --all` and paints the window from that palette. Switch themes and every page retints in place.
 
-Chroma reads `omarchy-theme-color --all` and paints the window from that palette. Hyprland keeps the 2px SSD border. The client draws a matching 2px accent rule. The window is a headerless `Window`, not an `ApplicationWindow`.
+![Chroma Studio on Tokyo Night](docs/chroma.png)
+
+Six pages share one `App.Page` nav: Studio, Palette, Surfaces, Type, Term, Session.
+
+Hyprland keeps the 2px SSD border. The client draws a matching 2px accent rule. The window is a headerless `Window`, not an `ApplicationWindow`.
 
 ## Build
 
@@ -19,6 +23,8 @@ The Qt project skips `cmake --install` (Arch's `libfcitx5platforminputcontextplu
 ```bash
 src/Chroma/bin/Debug/net10.0/Chroma
 ```
+
+QML binds colors through a singleton named `Theme`. Do not rename it to `Palette`. Qt Quick already owns that type, and `Palette.background` stays the default white.
 
 ## Theme-set hook
 
