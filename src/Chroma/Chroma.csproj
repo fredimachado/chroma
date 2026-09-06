@@ -46,6 +46,8 @@
     <None Include="Studio.qml" />
     <None Include="PaletteView.qml" />
     <None Include="Surfaces.qml" />
+    <None Include="Type.qml" />
+    <None Include="Term.qml" />
     <None Include="Session.qml" />
   </ItemGroup>
 

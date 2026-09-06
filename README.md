@@ -1,6 +1,6 @@
 # Chroma
 
-Live Omarchy theme studio. Four pages: Studio, Palette, Surfaces, Session.
+Live Omarchy theme studio. Six pages: Studio, Palette, Surfaces, Type, Term, Session.
 
 Chroma reads `omarchy-theme-color --all` and paints the window from that palette. Hyprland keeps the 2px SSD border. The client draws a matching 2px accent rule. The window is a headerless `Window`, not an `ApplicationWindow`.
 

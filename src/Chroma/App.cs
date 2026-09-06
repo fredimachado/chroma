@@ -14,6 +14,8 @@ public sealed class App : INotifyPropertyChanged
         Studio,
         Palette,
         Surfaces,
+        Type,
+        Term,
         Session,
     }
 

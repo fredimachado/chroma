@@ -17,12 +17,16 @@ Window {
     readonly property int pageStudio: 0
     readonly property int pagePalette: 1
     readonly property int pageSurfaces: 2
-    readonly property int pageSession: 3
+    readonly property int pageType: 3
+    readonly property int pageTerm: 4
+    readonly property int pageSession: 5
 
     readonly property var pages: [
         { page: root.pageStudio, label: "Studio" },
         { page: root.pagePalette, label: "Palette" },
         { page: root.pageSurfaces, label: "Surfaces" },
+        { page: root.pageType, label: "Type" },
+        { page: root.pageTerm, label: "Term" },
         { page: root.pageSession, label: "Session" }
     ]
 
@@ -124,6 +128,12 @@ Window {
                     return palettePage
                 if (App.page === root.pageSurfaces)
                     return surfacesPage
+                if (App.page === root.pageType)
+                    return typePage
+                if (App.page === root.pageTerm)
+                    return termPage
+                if (App.page === root.pageSession)
+                    return sessionPage
                 return sessionPage
             }
         }
@@ -132,5 +142,7 @@ Window {
     Component { id: studioPage; Studio {} }
     Component { id: palettePage; PaletteView {} }
     Component { id: surfacesPage; Surfaces {} }
+    Component { id: typePage; Type {} }
+    Component { id: termPage; Term {} }
     Component { id: sessionPage; Session {} }
 }
