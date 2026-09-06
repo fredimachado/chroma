@@ -1,0 +1,7 @@
+#!/bin/bash
+sock="${XDG_RUNTIME_DIR:-/tmp}/chroma.sock"
+stamp="${XDG_RUNTIME_DIR:-/tmp}/chroma.stamp"
+if printf x | nc -U -N "$sock" >/dev/null 2>&1; then
+  exit 0
+fi
+: > "$stamp"

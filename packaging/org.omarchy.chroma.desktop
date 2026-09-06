@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=Chroma
+GenericName=Theme Studio
+Comment=Live Omarchy theme studio
+Exec=Chroma
+Icon=preferences-desktop-theme
+Terminal=false
+Categories=Utility;DesktopSettings;
+Keywords=theme;palette;omarchy;color;
+StartupWMClass=Chroma

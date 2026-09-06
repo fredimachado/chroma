@@ -1,0 +1,344 @@
+import QtQuick
+
+Rectangle {
+    id: page
+    color: Palette.background
+
+    readonly property int ruleWidth: 2
+    readonly property int radius: 0
+    readonly property int sidebarWidth: 220
+
+    property int selectedIndex: 1
+
+    readonly property var inbox: [
+        { title: "Theme set finished", body: "tokyo-night applied across terminals and the bar.", stamp: "09:12", status: "ready" },
+        { title: "Hook ping dropped", body: "chroma.sock was missing. Stamp file used instead.", stamp: "09:18", status: "failed" },
+        { title: "Wallpaper swapped", body: "background symlink now points at winding-road.", stamp: "09:21", status: "ready" },
+        { title: "Font refresh queued", body: "JetBrainsMono Nerd Font still matches fc-match.", stamp: "09:24", status: "pending" },
+        { title: "Accent preview", body: "Studio hero should track Palette.accent live.", stamp: "09:30", status: "ready" }
+    ]
+
+    readonly property var logs: [
+        { tone: "green", line: "palette reload coalesced (watch + hook)" },
+        { tone: "yellow", line: "gsettings accent stayed blue, ignored" },
+        { tone: "red", line: "first socket bind lost a leftover chroma.sock" },
+        { tone: "muted", line: "watching ~/.local/state/omarchy/current/" }
+    ]
+
+    function badgeColor(status) {
+        if (status === "failed")
+            return Palette.red
+        if (status === "pending")
+            return Palette.yellow
+        return Palette.green
+    }
+
+    function badgeLabel(status) {
+        if (status === "failed")
+            return "Failed"
+        if (status === "pending")
+            return "Pending"
+        return "Ready"
+    }
+
+    Row {
+        anchors.fill: parent
+        spacing: 0
+
+        Rectangle {
+            width: page.sidebarWidth
+            height: parent.height
+            color: Palette.darkBackground
+
+            Column {
+                anchors.fill: parent
+                anchors.margins: 16
+                spacing: 10
+
+                Text {
+                    text: "MAIL"
+                    color: Palette.muted
+                    font.pixelSize: 11
+                    font.letterSpacing: 2
+                    font.bold: true
+                }
+
+                Repeater {
+                    model: ["Inbox", "Sent", "Drafts", "Archive"]
+
+                    Rectangle {
+                        required property int index
+                        required property string modelData
+                        width: parent.width
+                        height: 32
+                        color: index === 0 ? Palette.selection : "transparent"
+                        radius: page.radius
+
+                        Text {
+                            anchors.verticalCenter: parent.verticalCenter
+                            anchors.left: parent.left
+                            anchors.leftMargin: 10
+                            text: modelData
+                            color: index === 0 ? Palette.accent : Palette.foreground
+                            font.pixelSize: 13
+                        }
+
+                        Text {
+                            anchors.verticalCenter: parent.verticalCenter
+                            anchors.right: parent.right
+                            anchors.rightMargin: 10
+                            text: index === 0 ? String(page.inbox.length) : "0"
+                            color: Palette.muted
+                            font.family: "JetBrainsMono Nerd Font"
+                            font.pixelSize: 12
+                        }
+                    }
+                }
+
+                Item { height: 12; width: 1 }
+
+                Text {
+                    text: "STATUS"
+                    color: Palette.muted
+                    font.pixelSize: 11
+                    font.letterSpacing: 2
+                    font.bold: true
+                }
+
+                Text { text: "Failed"; color: Palette.red; font.pixelSize: 13 }
+                Text { text: "Ready"; color: Palette.green; font.pixelSize: 13 }
+                Text { text: "Pending"; color: Palette.yellow; font.pixelSize: 13 }
+            }
+        }
+
+        Rectangle {
+            width: page.ruleWidth
+            height: parent.height
+            color: Palette.muted
+        }
+
+        Item {
+            width: parent.width - page.sidebarWidth - page.ruleWidth
+            height: parent.height
+
+            Column {
+                anchors.fill: parent
+                anchors.margins: 20
+                spacing: 16
+
+                Text {
+                    text: "SURFACES"
+                    color: Palette.muted
+                    font.pixelSize: 12
+                    font.letterSpacing: 2
+                    font.bold: true
+                }
+
+                Row {
+                    width: parent.width
+                    height: parent.height - 220
+                    spacing: 16
+
+                    Rectangle {
+                        width: 280
+                        height: parent.height
+                        color: Palette.darkerBackground
+                        radius: page.radius
+                        border.width: 1
+                        border.color: Palette.muted
+
+                        Column {
+                            anchors.fill: parent
+                            anchors.margins: 8
+                            spacing: 4
+
+                            Repeater {
+                                model: page.inbox
+
+                                Rectangle {
+                                    required property int index
+                                    required property var modelData
+                                    width: parent.width
+                                    height: 64
+                                    color: page.selectedIndex === index ? Palette.selection : "transparent"
+                                    radius: page.radius
+
+                                    Column {
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        anchors.left: parent.left
+                                        anchors.right: parent.right
+                                        anchors.leftMargin: 10
+                                        anchors.rightMargin: 10
+                                        spacing: 4
+
+                                        Row {
+                                            width: parent.width
+                                            spacing: 8
+
+                                            Text {
+                                                text: modelData.title
+                                                color: Palette.foreground
+                                                font.pixelSize: 13
+                                                elide: Text.ElideRight
+                                                width: parent.width - 70
+                                            }
+
+                                            Text {
+                                                text: modelData.stamp
+                                                color: Palette.muted
+                                                font.family: "JetBrainsMono Nerd Font"
+                                                font.pixelSize: 11
+                                            }
+                                        }
+
+                                        Text {
+                                            text: modelData.body
+                                            color: Palette.darkForeground
+                                            font.pixelSize: 11
+                                            elide: Text.ElideRight
+                                            width: parent.width
+                                        }
+                                    }
+
+                                    MouseArea {
+                                        anchors.fill: parent
+                                        onClicked: page.selectedIndex = index
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    Rectangle {
+                        width: parent.width - 296
+                        height: parent.height
+                        color: Palette.lighterBackground
+                        radius: page.radius
+                        border.width: 1
+                        border.color: Palette.muted
+
+                        Column {
+                            anchors.fill: parent
+                            anchors.margins: 20
+                            spacing: 14
+
+                            Row {
+                                spacing: 10
+
+                                Rectangle {
+                                    width: 72
+                                    height: 22
+                                    color: page.badgeColor(page.inbox[page.selectedIndex].status)
+                                    radius: page.radius
+
+                                    Text {
+                                        anchors.centerIn: parent
+                                        text: page.badgeLabel(page.inbox[page.selectedIndex].status)
+                                        color: Palette.darkerBackground
+                                        font.pixelSize: 11
+                                        font.bold: true
+                                    }
+                                }
+
+                                Text {
+                                    text: page.inbox[page.selectedIndex].stamp
+                                    color: Palette.muted
+                                    font.family: "JetBrainsMono Nerd Font"
+                                    font.pixelSize: 12
+                                    anchors.verticalCenter: parent.verticalCenter
+                                }
+                            }
+
+                            Text {
+                                text: page.inbox[page.selectedIndex].title
+                                color: Palette.brightForeground
+                                font.pixelSize: 22
+                            }
+
+                            Rectangle {
+                                width: parent.width
+                                height: page.ruleWidth
+                                color: Palette.accent
+                            }
+
+                            Text {
+                                width: parent.width
+                                text: page.inbox[page.selectedIndex].body
+                                color: Palette.foreground
+                                font.pixelSize: 14
+                                wrapMode: Text.WordWrap
+                            }
+
+                            Rectangle {
+                                width: parent.width
+                                height: 36
+                                color: Palette.background
+                                border.width: 1
+                                border.color: Palette.muted
+                                radius: page.radius
+
+                                Text {
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    anchors.left: parent.left
+                                    anchors.leftMargin: 10
+                                    text: "Reply to this event…"
+                                    color: Palette.muted
+                                    font.pixelSize: 13
+                                }
+                            }
+                        }
+                    }
+                }
+
+                Rectangle {
+                    width: parent.width
+                    height: 168
+                    color: Palette.darkBackground
+                    radius: page.radius
+                    border.width: 1
+                    border.color: Palette.muted
+
+                    Column {
+                        anchors.fill: parent
+                        anchors.margins: 12
+                        spacing: 6
+
+                        Text {
+                            text: "EVENT LOG"
+                            color: Palette.muted
+                            font.pixelSize: 11
+                            font.letterSpacing: 1.5
+                            font.bold: true
+                        }
+
+                        Repeater {
+                            model: page.logs
+
+                            Row {
+                                required property var modelData
+                                spacing: 10
+
+                                Rectangle {
+                                    width: 8
+                                    height: 8
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    color: modelData.tone === "green" ? Palette.green
+                                         : modelData.tone === "yellow" ? Palette.yellow
+                                         : modelData.tone === "red" ? Palette.red
+                                         : Palette.muted
+                                }
+
+                                Text {
+                                    text: modelData.line
+                                    color: Palette.foreground
+                                    font.family: "JetBrainsMono Nerd Font"
+                                    font.pixelSize: 12
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

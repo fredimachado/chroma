@@ -1,0 +1,17 @@
+<Project>
+  <Target Name="QtBridgeDeploy"
+          AfterTargets="CopyFilesToOutputDirectory"
+          DependsOnTargets="QtBridgeBuild"
+          Condition="'$(DesignTimeBuild)' != 'true' and '$(UsingQtBridge)' == 'true'">
+    <Message Importance="high" Text="Qt Bridge: skipping cmake install (Arch fcitx plugin RPATH). Copying QML next to the host." />
+    <ItemGroup>
+      <QmlDeploy Condition="'@(Qml)' != ''"
+                 Include="$(ProjectDir)$(IntermediateOutputPath)$(QtQmlSourceDir)%(Qml.SourceDir)*">
+        <SourceDir>%(Qml.SourceDir)</SourceDir>
+      </QmlDeploy>
+    </ItemGroup>
+    <Copy Condition="'@(QmlDeploy)' != ''"
+          SourceFiles="%(Identity)"
+          DestinationFolder="$(TargetDir)%(SourceDir)" />
+  </Target>
+</Project>

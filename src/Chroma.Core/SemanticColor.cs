@@ -1,0 +1,30 @@
+namespace Omarchy.Chroma;
+
+public enum SemanticColor
+{
+    Accent,
+    Selection,
+    Muted,
+    Background,
+    DarkBackground,
+    DarkerBackground,
+    LighterBackground,
+    Foreground,
+    DarkForeground,
+    LightForeground,
+    BrightForeground,
+    Red,
+    Yellow,
+    Orange,
+    Green,
+    Cyan,
+    Blue,
+    Magenta,
+    Brown,
+    BrightRed,
+    BrightYellow,
+    BrightGreen,
+    BrightCyan,
+    BrightBlue,
+    BrightMagenta,
+}
