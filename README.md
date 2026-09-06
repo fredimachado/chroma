@@ -1,6 +1,8 @@
 # Chroma
 
-Live Omarchy theme studio. Chroma reads `omarchy-theme-color --all` and paints the window from that palette. Switch themes and every page retints in place.
+An experiment in writing Omarchy desktop apps with C# on .NET 10 and Qt 6.
+
+Chroma is the vehicle: a live theme studio. It reads `omarchy-theme-color --all` and paints the window from that palette. Switch themes and every page retints in place. Logic lives in C#. The UI is QML through Qt Bridge for C#.
 
 ![Chroma Studio on Tokyo Night](docs/chroma.png)
 
@@ -8,9 +10,15 @@ Six pages share one `App.Page` nav: Studio, Palette, Surfaces, Type, Term, Sessi
 
 Hyprland keeps the 2px SSD border. The client draws a matching 2px accent rule. The window is a headerless `Window`, not an `ApplicationWindow`.
 
-## Build
+## Stack
 
-You need .NET SDK 10 and Qt 6 at `/usr` (`/usr/lib/cmake/Qt6/Qt6Config.cmake`).
+- .NET 10, `net10.0`
+- Qt 6 from `/usr` (`/usr/lib/cmake/Qt6/Qt6Config.cmake`)
+- `QtGroup.Qt.Bridge.CSharp.linux-x64` `0.3.*-*`
+- QML for the shell, C# for parse, watch, and session
+- Omarchy theme data from `omarchy-theme-color --all` only
+
+## Build
 
 ```bash
 export QtDir=/usr
