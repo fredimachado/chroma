@@ -58,4 +58,32 @@ public sealed class ThemeDirectoryMonitorTests
         {
         }
     }
+
+    [Fact]
+    public void Deleting_theme_root_then_recreating_still_signals_after_retry()
+    {
+        var root = Path.Combine(Path.GetTempPath(), "chroma-monitor-" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(root);
+        File.WriteAllText(Path.Combine(root, "theme.name"), "seed");
+
+        var signals = 0;
+        using var monitor = new ThemeDirectoryMonitor(root);
+        monitor.Changed += () => Interlocked.Increment(ref signals);
+        monitor.Start();
+
+        Directory.Delete(root, true);
+        Directory.CreateDirectory(root);
+        File.WriteAllText(Path.Combine(root, "theme.name"), "after-retry");
+
+        var signaled = SpinWait.SpinUntil(() => Volatile.Read(ref signals) > 0, TimeSpan.FromSeconds(5));
+        Assert.True(signaled, "Expected a change signal after the theme root was deleted and recreated.");
+
+        try
+        {
+            Directory.Delete(root, true);
+        }
+        catch
+        {
+        }
+    }
 }

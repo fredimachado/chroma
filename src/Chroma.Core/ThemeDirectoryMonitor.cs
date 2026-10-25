@@ -38,7 +38,7 @@ public sealed class ThemeDirectoryMonitor : IDisposable
 
             _onChanged = onChanged;
             _started = true;
-            AttachWatcher();
+            EnsureWatcher();
         }
     }
 
@@ -71,20 +71,23 @@ public sealed class ThemeDirectoryMonitor : IDisposable
         }
     }
 
-    void AttachWatcher()
+    void EnsureWatcher()
+    {
+        if (TryAttachWatcher())
+            return;
+
+        ScheduleAttachRetry();
+    }
+
+    bool TryAttachWatcher()
     {
         if (!_started || _disposed)
-            return;
+            return false;
 
         DisposeWatcher();
 
         if (!Directory.Exists(_root))
-        {
-            ScheduleAttachRetry();
-            return;
-        }
-
-        CancelAttachRetry();
+            return false;
 
         FileSystemWatcher? watcher = null;
         try
@@ -102,12 +105,14 @@ public sealed class ThemeDirectoryMonitor : IDisposable
             watcher.Renamed += OnFileSystemEvent;
             watcher.EnableRaisingEvents = true;
             _watcher = watcher;
+            CancelAttachRetry();
+            return true;
         }
         catch
         {
             watcher?.Dispose();
             _watcher = null;
-            ScheduleAttachRetry();
+            return false;
         }
     }
 
@@ -140,7 +145,7 @@ public sealed class ThemeDirectoryMonitor : IDisposable
                     if (!_started || _disposed)
                         return;
 
-                    AttachWatcher();
+                    EnsureWatcher();
                     shouldRaise = true;
                 }
 
@@ -160,33 +165,47 @@ public sealed class ThemeDirectoryMonitor : IDisposable
         _ = Task.Run(async () =>
         {
             var delayMs = AttachRetryInitialMilliseconds;
-            while (!token.IsCancellationRequested)
+            var succeeded = false;
+            try
             {
-                try
+                while (!token.IsCancellationRequested)
                 {
-                    await Task.Delay(delayMs, token);
-                }
-                catch (TaskCanceledException)
-                {
-                    return;
-                }
-
-                lock (_gate)
-                {
-                    if (token.IsCancellationRequested || !_started || _disposed)
-                        return;
-
-                    if (_watcher is not null)
-                        return;
-
-                    if (!Directory.Exists(_root))
+                    try
                     {
-                        delayMs = Math.Min(delayMs * 2, AttachRetryMaxMilliseconds);
-                        continue;
+                        await Task.Delay(delayMs, token);
+                    }
+                    catch (TaskCanceledException)
+                    {
+                        return;
                     }
 
-                    AttachWatcher();
-                    return;
+                    lock (_gate)
+                    {
+                        if (token.IsCancellationRequested || !_started || _disposed)
+                            return;
+
+                        if (TryAttachWatcher())
+                        {
+                            succeeded = true;
+                            return;
+                        }
+
+                        delayMs = Math.Min(delayMs * 2, AttachRetryMaxMilliseconds);
+                    }
+                }
+            }
+            finally
+            {
+                if (!succeeded)
+                {
+                    lock (_gate)
+                    {
+                        if (_attachRetryCts is not null && _attachRetryCts.Token == token)
+                        {
+                            _attachRetryCts.Dispose();
+                            _attachRetryCts = null;
+                        }
+                    }
                 }
             }
         });
