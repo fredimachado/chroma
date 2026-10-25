@@ -84,7 +84,7 @@ public sealed class App : INotifyPropertyChanged
         RefreshSession();
     }
 
-    public static SessionCapture CaptureSession()
+    internal static SessionCapture CaptureSession()
     {
         var home = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
         var current = Path.Combine(home, ".local", "state", "omarchy", "current");
@@ -101,7 +101,7 @@ public sealed class App : INotifyPropertyChanged
             iconError);
     }
 
-    public void ApplySession(SessionCapture session, bool updateLastError = true)
+    internal void ApplySession(SessionCapture session, bool updateLastError = true)
     {
         Assign(ref _themeName, session.ThemeName, nameof(ThemeName));
         Assign(ref _wallpaperPath, session.WallpaperPath, nameof(WallpaperPath));
