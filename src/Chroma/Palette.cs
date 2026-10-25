@@ -222,8 +222,8 @@ public sealed class Palette : INotifyPropertyChanged
 
     bool ApplyReadResult((bool Ok, ThemeSnapshot Snapshot, string Error, SessionCapture Session) result)
     {
-        App.Instance.ApplySession(result.Session);
-        return ApplyThemeReadResult(result.Ok, result.Snapshot, result.Error);
+        App.Instance.ApplySession(result.Session, updateLastError: false);
+        return ApplyThemeReadResult(result.Ok, result.Snapshot, result.Error, result.Session.CaptureError);
     }
 
     Task PostApplyAsync((bool Ok, ThemeSnapshot Snapshot, string Error, SessionCapture Session) result)
@@ -251,11 +251,11 @@ public sealed class Palette : INotifyPropertyChanged
         return tcs.Task;
     }
 
-    bool ApplyThemeReadResult(bool ok, ThemeSnapshot snap, string error)
+    bool ApplyThemeReadResult(bool ok, ThemeSnapshot snap, string error, string captureError)
     {
         if (ok)
         {
-            App.Instance.SetLastError("");
+            App.Instance.SetLastError(captureError);
             WriteRuntimePalette(snap);
             _hasSuccessfulLoad = true;
             return Apply(snap);

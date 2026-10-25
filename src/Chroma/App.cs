@@ -94,7 +94,7 @@ public sealed class App : INotifyPropertyChanged
             iconError);
     }
 
-    public void ApplySession(SessionCapture session)
+    public void ApplySession(SessionCapture session, bool updateLastError = true)
     {
         Assign(ref _themeName, session.ThemeName, nameof(ThemeName));
         Assign(ref _wallpaperPath, session.WallpaperPath, nameof(WallpaperPath));
@@ -103,7 +103,7 @@ public sealed class App : INotifyPropertyChanged
         Assign(ref _qtDir, session.QtDir, nameof(QtDir));
         Assign(ref _colorsTomlPath, session.ColorsTomlPath, nameof(ColorsTomlPath));
         Assign(ref _hookInstalled, session.HookInstalled, nameof(HookInstalled));
-        if (!string.IsNullOrEmpty(session.CaptureError))
+        if (updateLastError)
             SetLastError(session.CaptureError);
     }
 
