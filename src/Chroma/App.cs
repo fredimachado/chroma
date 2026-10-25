@@ -1,5 +1,4 @@
 using System.ComponentModel;
-using System.Diagnostics;
 using Qt.MetaObject;
 using Qt.Quick;
 
@@ -12,7 +11,8 @@ internal readonly record struct SessionCapture(
     string FontName,
     string QtDir,
     string ColorsTomlPath,
-    bool HookInstalled);
+    bool HookInstalled,
+    string CaptureError);
 
 [QObject]
 [QmlElement(Name = "App", Singleton = true)]
@@ -82,14 +82,16 @@ public sealed class App : INotifyPropertyChanged
         var home = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
         var current = Path.Combine(home, ".local", "state", "omarchy", "current");
 
+        var (iconTheme, iconError) = ReadIconTheme();
         return new SessionCapture(
             ReadTrimmed(Path.Combine(current, "theme.name")),
             ResolveLink(Path.Combine(current, "background")),
-            ReadIconTheme(),
+            iconTheme,
             ReadFontName(),
             Environment.GetEnvironmentVariable("QtDir") is { Length: > 0 } qtDir ? qtDir : "/usr",
             Path.Combine(current, "theme", "colors.toml"),
-            File.Exists(HookPath()));
+            File.Exists(HookPath()),
+            iconError);
     }
 
     public void ApplySession(SessionCapture session)
@@ -101,6 +103,8 @@ public sealed class App : INotifyPropertyChanged
         Assign(ref _qtDir, session.QtDir, nameof(QtDir));
         Assign(ref _colorsTomlPath, session.ColorsTomlPath, nameof(ColorsTomlPath));
         Assign(ref _hookInstalled, session.HookInstalled, nameof(HookInstalled));
+        if (!string.IsNullOrEmpty(session.CaptureError))
+            SetLastError(session.CaptureError);
     }
 
     public void InstallHook()
@@ -178,43 +182,44 @@ public sealed class App : INotifyPropertyChanged
         }
     }
 
-    static string ReadIconTheme()
+    static readonly TimeSpan SessionProcessTimeout = TimeSpan.FromMilliseconds(1500);
+
+    static (string Theme, string Error) ReadIconTheme()
     {
-        var raw = Run("gsettings", "get org.gnome.desktop.interface icon-theme");
-        return raw.Trim().Trim('\'', '"');
+        var result = ProcessRunner.Run(
+            "gsettings",
+            ["get", "org.gnome.desktop.interface", "icon-theme"],
+            timeout: SessionProcessTimeout);
+        if (!result.Ok)
+            return ("", FormatProcessError("gsettings", result));
+
+        var theme = result.StdOut.Trim().Trim('\'', '"');
+        return (theme, "");
     }
 
     static string ReadFontName()
     {
-        var current = Run("omarchy-font-current", "");
-        if (current.Length > 0)
-            return current;
-        return Run("fc-match", "monospace -f %{family}\\n");
+        var current = ProcessRunner.Run("omarchy-font-current", [], timeout: SessionProcessTimeout);
+        if (current.Ok && current.StdOut.Trim().Length > 0)
+            return current.StdOut.Trim();
+
+        var match = ProcessRunner.Run(
+            "fc-match",
+            ["monospace", "-f", "%{family}\n"],
+            timeout: SessionProcessTimeout);
+        if (match.Ok && match.StdOut.Trim().Length > 0)
+            return match.StdOut.Trim();
+
+        return "monospace";
     }
 
-    static string Run(string fileName, string arguments)
+    static string FormatProcessError(string name, ProcessRunResult result)
     {
-        try
-        {
-            var psi = new ProcessStartInfo
-            {
-                FileName = fileName,
-                Arguments = arguments,
-                RedirectStandardOutput = true,
-                RedirectStandardError = true,
-                UseShellExecute = false,
-            };
-            using var process = Process.Start(psi);
-            if (process is null)
-                return "";
-            var output = process.StandardOutput.ReadToEnd().Trim();
-            process.WaitForExit(1500);
-            return output;
-        }
-        catch
-        {
-            return "";
-        }
+        if (result.TimedOut)
+            return $"{name} timed out.";
+        return string.IsNullOrWhiteSpace(result.StdErr)
+            ? $"{name} exited {result.ExitCode}."
+            : result.StdErr.Trim();
     }
 
     void Assign(ref string field, string value, string name)

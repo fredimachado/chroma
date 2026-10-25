@@ -57,6 +57,7 @@ public static class ThemeWatch
         _listener = null;
 
         var sockPath = Path.Combine(RuntimeDir(), "chroma.sock");
+        // Best-effort socket cleanup on shutdown; ignore I/O errors.
         try
         {
             if (File.Exists(sockPath))

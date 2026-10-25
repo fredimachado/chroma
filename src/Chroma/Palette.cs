@@ -1,5 +1,4 @@
 using System.ComponentModel;
-using System.Diagnostics;
 using Qt.MetaObject;
 using Qt.Quick;
 
@@ -23,24 +22,20 @@ public sealed class Swatch : INotifyPropertyChanged
 
     public void Copy()
     {
-        try
-        {
-            var psi = new ProcessStartInfo
-            {
-                FileName = "wl-copy",
-                RedirectStandardInput = true,
-                UseShellExecute = false,
-            };
-            using var process = Process.Start(psi);
-            if (process is null)
-                return;
-            process.StandardInput.Write(Hex);
-            process.StandardInput.Close();
-            process.WaitForExit(500);
-        }
-        catch
-        {
-        }
+        var result = ProcessRunner.Run("wl-copy", stdin: Hex, timeout: TimeSpan.FromMilliseconds(500));
+        if (result.Ok)
+            return;
+
+        App.Instance.SetLastError(FormatWlCopyError(result));
+    }
+
+    static string FormatWlCopyError(ProcessRunResult result)
+    {
+        if (result.TimedOut)
+            return "wl-copy timed out.";
+        return string.IsNullOrWhiteSpace(result.StdErr)
+            ? $"wl-copy exited {result.ExitCode}."
+            : result.StdErr.Trim();
     }
 
     internal bool TryAssign(HexColor color)
@@ -318,6 +313,7 @@ public sealed class Palette : INotifyPropertyChanged
 
     static void WriteRuntimePalette(ThemeSnapshot snap)
     {
+        // Best-effort write for external consumers; failures are ignored and do not clear LastError.
         try
         {
             var dir = Environment.GetEnvironmentVariable("XDG_RUNTIME_DIR");
