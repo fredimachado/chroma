@@ -1,0 +1,31 @@
+name: CI
+
+on:
+  push:
+    branches: [master, main]
+  pull_request:
+
+jobs:
+  test:
+    name: dotnet test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.x"
+      - name: Test
+        run: dotnet test tests/Chroma.Tests/Chroma.Tests.csproj
+
+  chroma-linux:
+    name: Chroma build (Arch)
+    runs-on: ubuntu-latest
+    container: archlinux:latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install dependencies
+        run: |
+          pacman -Syu --noconfirm
+          pacman -S --noconfirm dotnet-sdk-10.0 qt6-base qt6-declarative cmake ninja
+      - name: Build Chroma
+        run: dotnet build src/Chroma/Chroma.csproj -p:QtDir=/usr

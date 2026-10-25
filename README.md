@@ -32,6 +32,22 @@ The Qt project skips `cmake --install` (Arch's `libfcitx5platforminputcontextplu
 src/Chroma/bin/Debug/net10.0/Chroma
 ```
 
+## Install
+
+After a Release or Debug build on Linux:
+
+```bash
+packaging/install.sh src/Chroma/bin/Debug/net10.0
+```
+
+With no argument, `install.sh` picks the newest `net10.0` folder under `src/Chroma/bin/`. It copies the build into `~/.local/share/chroma/`, symlinks `~/.local/bin/chroma` to the native host, and installs `~/.local/share/applications/org.omarchy.chroma.desktop` with `Exec` set to that symlink. Ensure `~/.local/bin` is on your `PATH`, then launch:
+
+```bash
+chroma
+```
+
+Desktop entry id: `org.omarchy.chroma`.
+
 QML binds colors through a singleton named `Theme`. Do not rename it to `Palette`. Qt Quick already owns that type, and `Palette.background` stays the default white.
 
 ## Theme-set hook
@@ -46,4 +62,4 @@ You can also install the hook from the Session page.
 
 ## Desktop file
 
-`packaging/org.omarchy.chroma.desktop` starts `Chroma`. Put the native host on `PATH`, or change `Exec` to the built path under `src/Chroma/bin/`.
+`packaging/org.omarchy.chroma.desktop` uses `Exec=chroma` (application id `org.omarchy.chroma`). `packaging/install.sh` rewrites `Exec` to your `~/.local/bin/chroma` symlink. For a manual install, put a `chroma` wrapper on `PATH` or point `Exec` at the built host under `src/Chroma/bin/`.

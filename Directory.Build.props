@@ -1,5 +1,7 @@
 <Project>
   <PropertyGroup>
     <QtDir Condition="'$(QtDir)' == ''">/usr</QtDir>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <AnalysisLevel>10.0</AnalysisLevel>
   </PropertyGroup>
 </Project>
