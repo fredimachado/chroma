@@ -30,9 +30,9 @@ public sealed class ThemeDirectoryMonitor : IDisposable
 
     public void Start(Action? onChanged = null)
     {
-        ObjectDisposedException.ThrowIf(_disposed, this);
         lock (_gate)
         {
+            ObjectDisposedException.ThrowIf(_disposed, this);
             if (_started)
                 return;
 
@@ -86,19 +86,29 @@ public sealed class ThemeDirectoryMonitor : IDisposable
 
         CancelAttachRetry();
 
-        var watcher = new FileSystemWatcher(_root)
+        FileSystemWatcher? watcher = null;
+        try
         {
-            NotifyFilter = NotifyFilters.FileName | NotifyFilters.DirectoryName | NotifyFilters.LastWrite,
-            IncludeSubdirectories = true,
-            EnableRaisingEvents = false,
-        };
+            watcher = new FileSystemWatcher(_root)
+            {
+                NotifyFilter = NotifyFilters.FileName | NotifyFilters.DirectoryName | NotifyFilters.LastWrite,
+                IncludeSubdirectories = true,
+                EnableRaisingEvents = false,
+            };
 
-        watcher.Changed += OnFileSystemEvent;
-        watcher.Created += OnFileSystemEvent;
-        watcher.Deleted += OnFileSystemEvent;
-        watcher.Renamed += OnFileSystemEvent;
-        watcher.EnableRaisingEvents = true;
-        _watcher = watcher;
+            watcher.Changed += OnFileSystemEvent;
+            watcher.Created += OnFileSystemEvent;
+            watcher.Deleted += OnFileSystemEvent;
+            watcher.Renamed += OnFileSystemEvent;
+            watcher.EnableRaisingEvents = true;
+            _watcher = watcher;
+        }
+        catch
+        {
+            watcher?.Dispose();
+            _watcher = null;
+            ScheduleAttachRetry();
+        }
     }
 
     void OnFileSystemEvent(object sender, FileSystemEventArgs e) => ScheduleSignal();
@@ -210,10 +220,18 @@ public sealed class ThemeDirectoryMonitor : IDisposable
 
     void RaiseChanged()
     {
-        if (!_started || _disposed)
-            return;
+        Action? onChanged;
+        Action? changedHandlers;
+        lock (_gate)
+        {
+            if (!_started || _disposed)
+                return;
 
-        _onChanged?.Invoke();
-        Changed?.Invoke();
+            onChanged = _onChanged;
+            changedHandlers = Changed;
+        }
+
+        onChanged?.Invoke();
+        changedHandlers?.Invoke();
     }
 }

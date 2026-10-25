@@ -59,11 +59,11 @@ public static class ProcessRunner
                 process.WaitForExit((int)PostKillWait.TotalMilliseconds);
             }
 
-            Task.WaitAll(stdoutTask, stderrTask);
+            Task.WaitAll([stdoutTask, stderrTask], (int)PostKillWait.TotalMilliseconds);
 
             var exitCode = timedOut ? -1 : process.ExitCode;
-            var stdout = stdoutTask.Result;
-            var stderr = stderrTask.Result;
+            var stdout = stdoutTask.IsCompletedSuccessfully ? stdoutTask.Result : "";
+            var stderr = stderrTask.IsCompletedSuccessfully ? stderrTask.Result : "";
             var ok = !timedOut && exitCode == 0;
 
             return new ProcessRunResult(ok, stdout, stderr, exitCode, timedOut);
