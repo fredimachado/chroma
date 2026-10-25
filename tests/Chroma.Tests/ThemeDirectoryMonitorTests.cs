@@ -18,11 +18,14 @@ public sealed class ThemeDirectoryMonitorTests
         monitor.Changed += () => Interlocked.Increment(ref signals);
         monitor.Start();
 
+        // Give FileSystemWatcher time to arm before the first mutation (slow CI hosts).
+        Thread.Sleep(100);
+
         Directory.Delete(themeDir, true);
         Directory.CreateDirectory(themeDir);
         File.WriteAllText(Path.Combine(root, "theme.name"), "tokyo-night");
 
-        var signaled = SpinWait.SpinUntil(() => Volatile.Read(ref signals) > 0, TimeSpan.FromMilliseconds(500));
+        var signaled = SpinWait.SpinUntil(() => Volatile.Read(ref signals) > 0, TimeSpan.FromSeconds(3));
         Assert.True(signaled, "Expected a debounced change signal after theme directory replacement.");
 
         try
