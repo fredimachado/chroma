@@ -16,6 +16,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Chroma.Core\Chroma.Core.csproj" />
+    <ProjectReference Include="..\SleepHost\SleepHost.csproj" />
   </ItemGroup>
 
   <ItemGroup>

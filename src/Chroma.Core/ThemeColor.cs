@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using System.Text;
 
 namespace Omarchy.Chroma;
@@ -22,6 +21,8 @@ public static class ThemeColor
         ["selection_background"] = SemanticColor.Selection,
     };
 
+    public static ThemeSnapshot DefaultSnapshot() => ThemeDefaults.CreateSnapshot();
+
     public static bool TryReadAll(out ThemeSnapshot snapshot, out string error)
     {
         snapshot = default;
@@ -29,34 +30,22 @@ public static class ThemeColor
 
         try
         {
-            var psi = new ProcessStartInfo
+            var result = ProcessRunner.Run(ResolveCli(), ["--all"]);
+            if (result.TimedOut)
             {
-                FileName = ResolveCli(),
-                Arguments = "--all",
-                RedirectStandardOutput = true,
-                RedirectStandardError = true,
-                UseShellExecute = false,
-            };
-
-            using var process = Process.Start(psi);
-            if (process is null)
-            {
-                error = "omarchy-theme-color did not start.";
+                error = "omarchy-theme-color timed out.";
                 return false;
             }
 
-            var stdout = process.StandardOutput.ReadToEnd();
-            process.WaitForExit();
-            if (process.ExitCode != 0 || string.IsNullOrWhiteSpace(stdout))
+            if (!result.Ok || string.IsNullOrWhiteSpace(result.StdOut))
             {
-                var stderr = process.StandardError.ReadToEnd();
-                error = string.IsNullOrWhiteSpace(stderr)
-                    ? $"omarchy-theme-color exited {process.ExitCode}."
-                    : stderr.Trim();
+                error = string.IsNullOrWhiteSpace(result.StdErr)
+                    ? $"omarchy-theme-color exited {result.ExitCode}."
+                    : result.StdErr.Trim();
                 return false;
             }
 
-            snapshot = Parse(stdout);
+            snapshot = Parse(result.StdOut);
             return true;
         }
         catch (Exception ex)

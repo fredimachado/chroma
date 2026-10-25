@@ -68,4 +68,32 @@ public sealed class ThemeColorTests
         Assert.Equal(1, HexColor.Parse("#ffffff").Luminance);
         Assert.Equal(0, HexColor.Fallback.Luminance);
     }
+
+    [Fact]
+    public void Parse_fills_background_and_magenta_from_aliases_only()
+    {
+        const string tsv = """
+            bg	#1a1b26
+            purple	#ad8ee6
+            accent	#7aa2f7
+            mode	dark
+            """;
+
+        var snap = ThemeColor.Parse(tsv);
+
+        Assert.Equal("#1a1b26", snap[SemanticColor.Background].Value);
+        Assert.Equal("#ad8ee6", snap[SemanticColor.Magenta].Value);
+    }
+
+    [Fact]
+    public void DefaultSnapshot_uses_non_black_accent_and_background()
+    {
+        var snap = ThemeColor.DefaultSnapshot();
+
+        Assert.Equal("#7aa2f7", snap[SemanticColor.Accent].Value);
+        Assert.Equal("#1a1b26", snap[SemanticColor.Background].Value);
+        Assert.NotEqual("#000000", snap[SemanticColor.Accent].Value);
+        Assert.NotEqual("#000000", snap[SemanticColor.Background].Value);
+        Assert.Equal(ThemeMode.Dark, snap.Mode);
+    }
 }
