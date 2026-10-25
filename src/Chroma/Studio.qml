@@ -14,12 +14,9 @@ Rectangle {
         Column {
             spacing: 6
 
-            Text {
+            SectionLabel {
+                pageTitle: true
                 text: "STUDIO"
-                color: Theme.muted
-                font.pixelSize: 12
-                font.letterSpacing: 2
-                font.bold: true
             }
 
             Text {
@@ -29,11 +26,10 @@ Rectangle {
                 font.bold: true
             }
 
-            Text {
+            MonoText {
                 text: Theme.mode
                 color: Theme.accent
                 font.pixelSize: 14
-                font.family: "JetBrainsMono Nerd Font"
             }
         }
 
@@ -52,12 +48,11 @@ Rectangle {
                 color: Theme.accent
                 radius: 0
 
-                Text {
+                MonoText {
                     anchors.centerIn: parent
                     text: "accent"
                     color: Theme.darkerBackground
                     font.pixelSize: 13
-                    font.family: "JetBrainsMono Nerd Font"
                 }
             }
 
@@ -67,17 +62,11 @@ Rectangle {
 
                 Column {
                     spacing: 4
-                    Text {
-                        text: "WALLPAPER"
-                        color: Theme.muted
-                        font.pixelSize: 11
-                        font.letterSpacing: 1.5
-                    }
-                    Text {
+                    SectionLabel { text: "WALLPAPER" }
+                    MonoText {
                         text: App.wallpaperPath.length > 0 ? App.wallpaperPath : "none"
                         color: Theme.darkForeground
                         font.pixelSize: 13
-                        font.family: "JetBrainsMono Nerd Font"
                         wrapMode: Text.WrapAnywhere
                         width: 640
                     }
@@ -85,28 +74,17 @@ Rectangle {
 
                 Column {
                     spacing: 4
-                    Text {
-                        text: "LAST RELOAD"
-                        color: Theme.muted
-                        font.pixelSize: 11
-                        font.letterSpacing: 1.5
-                    }
-                    Text {
+                    SectionLabel { text: "LAST RELOAD" }
+                    MonoText {
                         text: Theme.lastReloaded.length > 0 ? Theme.lastReloaded : "not yet"
                         color: Theme.foreground
                         font.pixelSize: 13
-                        font.family: "JetBrainsMono Nerd Font"
                     }
                 }
 
                 Column {
                     spacing: 4
-                    Text {
-                        text: "MODE"
-                        color: Theme.muted
-                        font.pixelSize: 11
-                        font.letterSpacing: 1.5
-                    }
+                    SectionLabel { text: "MODE" }
                     Text {
                         text: Theme.mode
                         color: Theme.brightForeground

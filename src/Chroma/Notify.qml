@@ -100,11 +100,10 @@ Rectangle {
                             width: parent.width - stamp.implicitWidth - parent.spacing
                         }
 
-                        Text {
+                        MonoText {
                             id: stamp
                             text: modelData.stamp
                             color: Theme.muted
-                            font.family: "JetBrainsMono Nerd Font"
                             font.pixelSize: 11
                         }
                     }

@@ -74,11 +74,10 @@ Rectangle {
                 wrapMode: Text.WordWrap
             }
 
-            Text {
+            MonoText {
                 Layout.fillWidth: true
                 text: Theme.accent
                 color: Theme.accent
-                font.family: "JetBrainsMono Nerd Font"
                 font.pixelSize: 13
                 wrapMode: Text.WordWrap
             }

@@ -134,11 +134,10 @@ Rectangle {
                             anchors.verticalCenter: parent.verticalCenter
                             spacing: 16
 
-                            Text {
+                            MonoText {
                                 Layout.preferredWidth: page.gutterWidth
                                 text: index + 1
                                 color: Theme.muted
-                                font.family: "JetBrainsMono Nerd Font"
                                 font.pixelSize: 13
                                 horizontalAlignment: Text.AlignRight
                             }
@@ -149,7 +148,7 @@ Rectangle {
                                 Repeater {
                                     model: modelData.tokens
 
-                                    Text {
+                                    MonoText {
                                         required property var modelData
 
                                         text: modelData.bind === "accent" ? Theme.accent
@@ -162,7 +161,6 @@ Rectangle {
                                              : modelData.tone === "string" ? Theme.green
                                              : modelData.tone === "number" ? Theme.orange
                                              : Theme.muted
-                                        font.family: "JetBrainsMono Nerd Font"
                                         font.pixelSize: 13
                                     }
                                 }
@@ -179,19 +177,17 @@ Rectangle {
             Layout.fillWidth: true
             spacing: 16
 
-            Text {
+            MonoText {
                 text: App.themeName.length > 0 ? App.themeName : "unnamed"
                 color: Theme.muted
-                font.family: "JetBrainsMono Nerd Font"
                 font.pixelSize: 13
                 elide: Text.ElideRight
                 Layout.fillWidth: true
             }
 
-            Text {
+            MonoText {
                 text: Theme.mode
                 color: Theme.muted
-                font.family: "JetBrainsMono Nerd Font"
                 font.pixelSize: 13
             }
         }

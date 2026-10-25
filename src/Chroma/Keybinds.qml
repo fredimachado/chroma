@@ -64,20 +64,18 @@ Rectangle {
                             border.width: 1
                             border.color: Theme.muted
 
-                            Text {
+                            MonoText {
                                 id: superLabel
                                 anchors.centerIn: parent
                                 text: "Super"
                                 color: Theme.foreground
-                                font.family: "JetBrainsMono Nerd Font"
                                 font.pixelSize: 13
                             }
                         }
 
-                        Text {
+                        MonoText {
                             text: "+"
                             color: Theme.muted
-                            font.family: "JetBrainsMono Nerd Font"
                             font.pixelSize: 13
                         }
 
@@ -89,12 +87,11 @@ Rectangle {
                             border.width: 1
                             border.color: Theme.muted
 
-                            Text {
+                            MonoText {
                                 id: chordLabel
                                 anchors.centerIn: parent
                                 text: modelData.key
                                 color: modelData.accented ? Theme.darkerBackground : Theme.foreground
-                                font.family: "JetBrainsMono Nerd Font"
                                 font.pixelSize: 13
                             }
                         }

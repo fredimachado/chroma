@@ -1,4 +1,5 @@
 using System.ComponentModel;
+using System.Text;
 using Qt.MetaObject;
 using Qt.Quick;
 
@@ -77,6 +78,12 @@ public sealed class App : INotifyPropertyChanged
     public void RefreshSession()
         => ApplySession(CaptureSession());
 
+    public void ReloadTheme()
+    {
+        Palette.Instance.Reload();
+        RefreshSession();
+    }
+
     public static SessionCapture CaptureSession()
     {
         var home = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
@@ -116,7 +123,7 @@ public sealed class App : INotifyPropertyChanged
             if (dir is not null)
                 Directory.CreateDirectory(dir);
 
-            File.WriteAllText(path, HookScript);
+            File.WriteAllText(path, ReadHookScript());
             if (OperatingSystem.IsLinux())
             {
                 File.SetUnixFileMode(
@@ -144,16 +151,16 @@ public sealed class App : INotifyPropertyChanged
         return Path.Combine(home, ".config", "omarchy", "hooks", "theme-set.d", "chroma-theme-set");
     }
 
-    const string HookScript = """
-        #!/bin/bash
-        sock="${XDG_RUNTIME_DIR:-/tmp}/chroma.sock"
-        stamp="${XDG_RUNTIME_DIR:-/tmp}/chroma.stamp"
-        if printf x | nc -U -N "$sock" >/dev/null 2>&1; then
-          exit 0
-        fi
-        : > "$stamp"
+    internal static string ReadHookScript()
+    {
+        var assembly = typeof(App).Assembly;
+        using var stream = assembly.GetManifestResourceStream("chroma-theme-set");
+        if (stream is null)
+            throw new InvalidOperationException("Embedded chroma-theme-set hook script not found.");
 
-        """;
+        using var reader = new StreamReader(stream, Encoding.UTF8);
+        return reader.ReadToEnd();
+    }
 
     static string ReadTrimmed(string path)
     {

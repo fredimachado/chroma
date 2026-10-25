@@ -159,6 +159,28 @@ Window {
         }
     }
 
+    // Shortcuts: Ctrl+1..9 pages 0-8, Ctrl+0 Editor (9), Ctrl+- Session (10); Ctrl+[/] wrap; Ctrl+R reload; Ctrl+Q quit.
+    function wrapPage(index) {
+        const count = 11
+        return ((index % count) + count) % count
+    }
+
+    Shortcut { sequence: "Ctrl+1"; onActivated: App.go(root.pageStudio) }
+    Shortcut { sequence: "Ctrl+2"; onActivated: App.go(root.pagePalette) }
+    Shortcut { sequence: "Ctrl+3"; onActivated: App.go(root.pageSurfaces) }
+    Shortcut { sequence: "Ctrl+4"; onActivated: App.go(root.pageType) }
+    Shortcut { sequence: "Ctrl+5"; onActivated: App.go(root.pageTerm) }
+    Shortcut { sequence: "Ctrl+6"; onActivated: App.go(root.pageControls) }
+    Shortcut { sequence: "Ctrl+7"; onActivated: App.go(root.pageWall) }
+    Shortcut { sequence: "Ctrl+8"; onActivated: App.go(root.pageKeys) }
+    Shortcut { sequence: "Ctrl+9"; onActivated: App.go(root.pageNotify) }
+    Shortcut { sequence: "Ctrl+0"; onActivated: App.go(root.pageEditor) }
+    Shortcut { sequence: "Ctrl+-"; onActivated: App.go(root.pageSession) }
+    Shortcut { sequence: "Ctrl+["; onActivated: App.go(root.wrapPage(App.page - 1)) }
+    Shortcut { sequence: "Ctrl+]"; onActivated: App.go(root.wrapPage(App.page + 1)) }
+    Shortcut { sequence: "Ctrl+R"; onActivated: App.reloadTheme() }
+    Shortcut { sequence: "Ctrl+Q"; onActivated: Qt.quit() }
+
     Component { id: studioPage; Studio {} }
     Component { id: palettePage; PaletteView {} }
     Component { id: surfacesPage; Surfaces {} }

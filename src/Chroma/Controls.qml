@@ -29,13 +29,10 @@ Rectangle {
             width: parent.width
             spacing: 20
 
-            Text {
+            SectionLabel {
                 Layout.fillWidth: true
+                pageTitle: true
                 text: "CONTROLS"
-                color: Theme.muted
-                font.pixelSize: 12
-                font.letterSpacing: 2
-                font.bold: true
                 wrapMode: Text.WordWrap
             }
 
@@ -57,12 +54,9 @@ Rectangle {
                 Layout.fillWidth: true
                 spacing: 8
 
-                Text {
+                SectionLabel {
                     Layout.fillWidth: true
                     text: "BUTTON"
-                    color: Theme.muted
-                    font.pixelSize: 11
-                    font.letterSpacing: 1.5
                     wrapMode: Text.WordWrap
                 }
 
@@ -118,12 +112,9 @@ Rectangle {
                 Layout.fillWidth: true
                 spacing: 8
 
-                Text {
+                SectionLabel {
                     Layout.fillWidth: true
                     text: "FIELD"
-                    color: Theme.muted
-                    font.pixelSize: 11
-                    font.letterSpacing: 1.5
                     wrapMode: Text.WordWrap
                 }
 
@@ -165,12 +156,9 @@ Rectangle {
                 Layout.fillWidth: true
                 spacing: 8
 
-                Text {
+                SectionLabel {
                     Layout.fillWidth: true
                     text: "TOGGLE"
-                    color: Theme.muted
-                    font.pixelSize: 11
-                    font.letterSpacing: 1.5
                     wrapMode: Text.WordWrap
                 }
 
@@ -208,12 +196,9 @@ Rectangle {
                 Layout.fillWidth: true
                 spacing: 8
 
-                Text {
+                SectionLabel {
                     Layout.fillWidth: true
                     text: "SLIDER"
-                    color: Theme.muted
-                    font.pixelSize: 11
-                    font.letterSpacing: 1.5
                     wrapMode: Text.WordWrap
                 }
 
@@ -251,11 +236,10 @@ Rectangle {
                         }
                     }
 
-                    Text {
+                    MonoText {
                         Layout.preferredWidth: 36
                         text: page.level
                         color: Theme.foreground
-                        font.family: "JetBrainsMono Nerd Font"
                         font.pixelSize: 13
                         horizontalAlignment: Text.AlignRight
                         wrapMode: Text.WordWrap
@@ -267,12 +251,9 @@ Rectangle {
                 Layout.fillWidth: true
                 spacing: 8
 
-                Text {
+                SectionLabel {
                     Layout.fillWidth: true
                     text: "CHECKBOX"
-                    color: Theme.muted
-                    font.pixelSize: 11
-                    font.letterSpacing: 1.5
                     wrapMode: Text.WordWrap
                 }
 
@@ -309,12 +290,9 @@ Rectangle {
                 Layout.fillWidth: true
                 spacing: 8
 
-                Text {
+                SectionLabel {
                     Layout.fillWidth: true
                     text: "SEGMENT"
-                    color: Theme.muted
-                    font.pixelSize: 11
-                    font.letterSpacing: 1.5
                     wrapMode: Text.WordWrap
                 }
 

@@ -15,20 +15,16 @@ Rectangle {
             width: parent.width
             spacing: 16
 
-            Text {
+            SectionLabel {
+                pageTitle: true
                 text: "PALETTE"
-                color: Theme.muted
-                font.pixelSize: 12
-                font.letterSpacing: 2
-                font.bold: true
                 anchors.verticalCenter: parent.verticalCenter
             }
 
-            Text {
+            MonoText {
                 text: Theme.tokens.length + " tokens"
                 color: Theme.darkForeground
                 font.pixelSize: 12
-                font.family: "JetBrainsMono Nerd Font"
                 anchors.verticalCenter: parent.verticalCenter
             }
 
@@ -84,29 +80,26 @@ Rectangle {
                                 border.color: Theme.muted
                             }
 
-                            Text {
+                            MonoText {
                                 width: 200
                                 anchors.verticalCenter: parent.verticalCenter
                                 text: item.key
                                 color: Theme.foreground
-                                font.family: "JetBrainsMono Nerd Font"
                                 font.pixelSize: 13
                             }
 
-                            Text {
+                            MonoText {
                                 width: 110
                                 anchors.verticalCenter: parent.verticalCenter
                                 text: item.hex
                                 color: Theme.muted
-                                font.family: "JetBrainsMono Nerd Font"
                                 font.pixelSize: 13
                             }
 
-                            Text {
+                            MonoText {
                                 anchors.verticalCenter: parent.verticalCenter
                                 text: Number(item.luminance).toFixed(3)
                                 color: Theme.darkForeground
-                                font.family: "JetBrainsMono Nerd Font"
                                 font.pixelSize: 13
                             }
                         }

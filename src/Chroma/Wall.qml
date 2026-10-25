@@ -51,11 +51,10 @@ Rectangle {
             }
         }
 
-        Text {
+        MonoText {
             Layout.fillWidth: true
             text: App.wallpaperPath
             color: Theme.darkForeground
-            font.family: "JetBrainsMono Nerd Font"
             font.pixelSize: 13
             wrapMode: Text.WrapAnywhere
         }

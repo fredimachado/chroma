@@ -62,7 +62,7 @@ Rectangle {
                         { bind: "theme", tone: "green", text: "" }
                     ]
 
-                    Text {
+                    MonoText {
                         required property var modelData
                         Layout.fillWidth: true
                         text: modelData.bind === "accent" ? Theme.accent
@@ -75,7 +75,6 @@ Rectangle {
                              : modelData.tone === "green" ? Theme.green
                              : modelData.tone === "prompt" ? Theme.cyan
                              : Theme.foreground
-                        font.family: "JetBrainsMono Nerd Font"
                         font.pixelSize: 13
                         wrapMode: Text.WordWrap
                     }

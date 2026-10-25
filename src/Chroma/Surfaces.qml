@@ -15,7 +15,7 @@ Rectangle {
         { title: "Theme set finished", body: "tokyo-night applied across terminals and the bar.", stamp: "09:12", status: "ready" },
         { title: "Hook ping dropped", body: "chroma.sock was missing. Stamp file used instead.", stamp: "09:18", status: "failed" },
         { title: "Wallpaper swapped", body: "background symlink now points at winding-road.", stamp: "09:21", status: "ready" },
-        { title: "Font refresh queued", body: "JetBrainsMono Nerd Font still matches fc-match.", stamp: "09:24", status: "pending" },
+        { title: "Font refresh queued", body: "", stamp: "09:24", status: "pending" },
         { title: "Accent preview", body: "Studio hero should track Theme.accent live.", stamp: "09:30", status: "ready" }
     ]
 
@@ -25,6 +25,12 @@ Rectangle {
         { tone: "red", line: "first socket bind lost a leftover chroma.sock" },
         { tone: "muted", line: "watching ~/.local/state/omarchy/current/" }
     ]
+
+    function inboxBody(item) {
+        if (item.title === "Font refresh queued")
+            return App.fontName + " still matches fc-match."
+        return item.body
+    }
 
     function badgeColor(status) {
         if (status === "failed")
@@ -85,13 +91,12 @@ Rectangle {
                             font.pixelSize: 13
                         }
 
-                        Text {
+                        MonoText {
                             anchors.verticalCenter: parent.verticalCenter
                             anchors.right: parent.right
                             anchors.rightMargin: 10
                             text: index === 0 ? String(page.inbox.length) : "0"
                             color: Theme.muted
-                            font.family: "JetBrainsMono Nerd Font"
                             font.pixelSize: 12
                         }
                     }
@@ -184,16 +189,15 @@ Rectangle {
                                             width: parent.width - 70
                                         }
 
-                                        Text {
+                                        MonoText {
                                             text: modelData.stamp
                                             color: Theme.muted
-                                            font.family: "JetBrainsMono Nerd Font"
                                             font.pixelSize: 11
                                         }
                                     }
 
                                     Text {
-                                        text: modelData.body
+                                        text: page.inboxBody(modelData)
                                         color: Theme.darkForeground
                                         font.pixelSize: 11
                                         elide: Text.ElideRight
@@ -244,10 +248,9 @@ Rectangle {
                                 }
                             }
 
-                            Text {
+                            MonoText {
                                 text: page.inbox[page.selectedIndex].stamp
                                 color: Theme.muted
-                                font.family: "JetBrainsMono Nerd Font"
                                 font.pixelSize: 12
                                 Layout.fillWidth: true
                                 elide: Text.ElideRight
@@ -270,7 +273,7 @@ Rectangle {
 
                         Text {
                             Layout.fillWidth: true
-                            text: page.inbox[page.selectedIndex].body
+                            text: page.inboxBody(page.inbox[page.selectedIndex])
                             color: Theme.foreground
                             font.pixelSize: 14
                             wrapMode: Text.WordWrap
@@ -339,11 +342,10 @@ Rectangle {
                                      : Theme.muted
                             }
 
-                            Text {
+                            MonoText {
                                 Layout.fillWidth: true
                                 text: modelData.line
                                 color: Theme.foreground
-                                font.family: "JetBrainsMono Nerd Font"
                                 font.pixelSize: 12
                                 elide: Text.ElideRight
                             }

@@ -54,6 +54,9 @@
     <None Include="Notify.qml" />
     <None Include="Editor.qml" />
     <None Include="Session.qml" />
+    <None Include="MonoText.qml" />
+    <None Include="SectionLabel.qml" />
+    <EmbeddedResource Include="..\..\packaging\chroma-theme-set" LogicalName="chroma-theme-set" />
   </ItemGroup>
 
 </Project>

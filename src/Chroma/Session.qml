@@ -11,12 +11,9 @@ Rectangle {
         anchors.margins: 32
         spacing: 20
 
-        Text {
+        SectionLabel {
+            pageTitle: true
             text: "SESSION"
-            color: Theme.muted
-            font.pixelSize: 12
-            font.letterSpacing: 2
-            font.bold: true
         }
 
         Text {
@@ -33,6 +30,7 @@ Rectangle {
 
         Repeater {
             model: [
+                { label: "App id", value: "org.omarchy.chroma" },
                 { label: "Icon theme", value: App.iconTheme },
                 { label: "Font", value: App.fontName },
                 { label: "QtDir", value: App.qtDir },
@@ -44,17 +42,11 @@ Rectangle {
                 spacing: 4
                 width: parent.width
 
-                Text {
-                    text: modelData.label.toUpperCase()
-                    color: Theme.muted
-                    font.pixelSize: 11
-                    font.letterSpacing: 1.5
-                }
+                SectionLabel { text: modelData.label.toUpperCase() }
 
-                Text {
+                MonoText {
                     text: modelData.value.length > 0 ? modelData.value : "-"
                     color: Theme.foreground
-                    font.family: "JetBrainsMono Nerd Font"
                     font.pixelSize: 13
                     wrapMode: Text.WrapAnywhere
                     width: parent.width
@@ -62,12 +54,11 @@ Rectangle {
             }
         }
 
-        Text {
+        MonoText {
             visible: App.lastError.length > 0
             width: parent.width
             text: App.lastError
             color: Theme.red
-            font.family: "JetBrainsMono Nerd Font"
             font.pixelSize: 13
             wrapMode: Text.WordWrap
         }
@@ -114,10 +105,7 @@ Rectangle {
                 MouseArea {
                     anchors.fill: parent
                     cursorShape: Qt.PointingHandCursor
-                    onClicked: {
-                        Theme.reload()
-                        App.refreshSession()
-                    }
+                    onClicked: App.reloadTheme()
                 }
             }
         }
