@@ -70,6 +70,16 @@ public sealed class Palette : INotifyPropertyChanged
     static string _lastReloaded = "";
     static bool _reloadRunning;
     static bool _reloadQueued;
+    static bool _hasSuccessfulLoad;
+    static SynchronizationContext? _ui;
+
+    static Palette()
+    {
+        var defaults = ThemeColor.DefaultSnapshot();
+        foreach (var key in Keys)
+            Store[(int)key].TryAssign(defaults[key]);
+        _mode = defaults.Mode == ThemeMode.Light ? "light" : "dark";
+    }
 
     public Palette()
     {
@@ -116,6 +126,29 @@ public sealed class Palette : INotifyPropertyChanged
 
     public bool Reload()
     {
+        EnsureUiContext();
+        return ReloadSync();
+    }
+
+    public void QueueReload()
+    {
+        EnsureUiContext();
+        lock (ReloadGate)
+        {
+            if (_reloadRunning)
+            {
+                _reloadQueued = true;
+                return;
+            }
+
+            _reloadRunning = true;
+        }
+
+        _ = Task.Run(ReloadWorkerLoop);
+    }
+
+    bool ReloadSync()
+    {
         lock (ReloadGate)
         {
             if (_reloadRunning)
@@ -132,17 +165,7 @@ public sealed class Palette : INotifyPropertyChanged
         {
             while (true)
             {
-                if (ThemeColor.TryReadAll(out var snap, out var error))
-                {
-                    App.Instance.SetLastError("");
-                    WriteRuntimePalette(snap);
-                    if (Apply(snap))
-                        changed = true;
-                }
-                else
-                {
-                    App.Instance.SetLastError(error);
-                }
+                changed |= ApplyReadResult(ReadThemeOffThread());
 
                 lock (ReloadGate)
                 {
@@ -162,6 +185,125 @@ public sealed class Palette : INotifyPropertyChanged
                 _reloadRunning = false;
             throw;
         }
+    }
+
+    async Task ReloadWorkerLoop()
+    {
+        try
+        {
+            while (true)
+            {
+                var result = ReadThemeOffThread();
+                await PostApplyAsync(result);
+
+                lock (ReloadGate)
+                {
+                    if (!_reloadQueued)
+                    {
+                        _reloadRunning = false;
+                        return;
+                    }
+
+                    _reloadQueued = false;
+                }
+            }
+        }
+        catch
+        {
+            lock (ReloadGate)
+                _reloadRunning = false;
+            throw;
+        }
+    }
+
+    static (bool Ok, ThemeSnapshot Snapshot, string Error, SessionCapture Session) ReadThemeOffThread()
+    {
+        var session = App.CaptureSession();
+        if (ThemeColor.TryReadAll(out var snap, out var error))
+            return (true, snap, "", session);
+
+        return (false, default, error, session);
+    }
+
+    bool ApplyReadResult((bool Ok, ThemeSnapshot Snapshot, string Error, SessionCapture Session) result)
+    {
+        App.Instance.ApplySession(result.Session);
+        return ApplyThemeReadResult(result.Ok, result.Snapshot, result.Error);
+    }
+
+    Task PostApplyAsync((bool Ok, ThemeSnapshot Snapshot, string Error, SessionCapture Session) result)
+    {
+        var tcs = new TaskCompletionSource();
+        var ui = _ui;
+        if (ui is null)
+        {
+            ApplyReadResult(result);
+            tcs.SetResult();
+            return tcs.Task;
+        }
+
+        ui.Post(_ =>
+        {
+            try
+            {
+                ApplyReadResult(result);
+            }
+            finally
+            {
+                tcs.SetResult();
+            }
+        }, null);
+        return tcs.Task;
+    }
+
+    bool ApplyThemeReadResult(bool ok, ThemeSnapshot snap, string error)
+    {
+        if (ok)
+        {
+            App.Instance.SetLastError("");
+            WriteRuntimePalette(snap);
+            _hasSuccessfulLoad = true;
+            return Apply(snap);
+        }
+
+        App.Instance.SetLastError(error);
+        if (_hasSuccessfulLoad)
+            return false;
+
+        return Apply(ThemeColor.DefaultSnapshot());
+    }
+
+    internal bool Apply(ThemeSnapshot snap)
+    {
+        var changed = false;
+        foreach (var key in Keys)
+        {
+            if (!Store[(int)key].TryAssign(snap[key]))
+                continue;
+            changed = true;
+            Raise(PropertyName(key));
+        }
+
+        var mode = snap.Mode == ThemeMode.Light ? "light" : "dark";
+        if (mode != _mode)
+        {
+            _mode = mode;
+            changed = true;
+            Raise(nameof(Mode));
+        }
+
+        if (!changed)
+            return false;
+
+        _lastReloaded = snap.ReadAt.ToLocalTime().ToString("O");
+        Raise(nameof(LastReloaded));
+        return true;
+    }
+
+    static void EnsureUiContext()
+    {
+        if (_ui is null && SynchronizationContext.Current is { } ctx)
+            _ui = ctx;
     }
 
     static Swatch[] CreateStore()
@@ -189,33 +331,6 @@ public sealed class Palette : INotifyPropertyChanged
         catch
         {
         }
-    }
-
-    bool Apply(ThemeSnapshot snap)
-    {
-        var changed = false;
-        foreach (var key in Keys)
-        {
-            if (!Store[(int)key].TryAssign(snap[key]))
-                continue;
-            changed = true;
-            Raise(PropertyName(key));
-        }
-
-        var mode = snap.Mode == ThemeMode.Light ? "light" : "dark";
-        if (mode != _mode)
-        {
-            _mode = mode;
-            changed = true;
-            Raise(nameof(Mode));
-        }
-
-        if (!changed)
-            return false;
-
-        _lastReloaded = snap.ReadAt.ToLocalTime().ToString("O");
-        Raise(nameof(LastReloaded));
-        return true;
     }
 
     void Raise(string name)

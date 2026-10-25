@@ -6,10 +6,12 @@ namespace Omarchy.Chroma;
 [Qt.Ignore]
 public static class ThemeWatch
 {
+    const int DebounceMilliseconds = 80;
+
     static readonly object Gate = new();
     static Action? _onThemeSignal;
     static SynchronizationContext? _ui;
-    static FileSystemWatcher? _currentWatcher;
+    static ThemeDirectoryMonitor? _directoryMonitor;
     static FileSystemWatcher? _stampWatcher;
     static Socket? _listener;
     static CancellationTokenSource? _debounce;
@@ -25,7 +27,11 @@ public static class ThemeWatch
         _ui = SynchronizationContext.Current;
         _started = true;
 
-        WatchCurrent();
+        // Directory monitor debounces FS events internally; stamp/socket share this gate (~160ms total is fine).
+        _directoryMonitor = new ThemeDirectoryMonitor();
+        _directoryMonitor.Changed += Signal;
+        _directoryMonitor.Start();
+
         ListenSocket();
         WatchStamp();
     }
@@ -34,33 +40,27 @@ public static class ThemeWatch
     {
         _started = false;
         _listenCancel?.Cancel();
+        _listenCancel?.Dispose();
+        _listenCancel = null;
         _debounce?.Cancel();
-        _currentWatcher?.Dispose();
+        _debounce?.Dispose();
+        _debounce = null;
+        _directoryMonitor?.Dispose();
+        _directoryMonitor = null;
         _stampWatcher?.Dispose();
-        _listener?.Dispose();
-        _currentWatcher = null;
         _stampWatcher = null;
+        _listener?.Dispose();
         _listener = null;
-    }
 
-    static void WatchCurrent()
-    {
-        var home = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-        var path = Path.Combine(home, ".local", "state", "omarchy", "current");
-        if (!Directory.Exists(path))
-            return;
-
-        var watcher = new FileSystemWatcher(path)
+        var sockPath = Path.Combine(RuntimeDir(), "chroma.sock");
+        try
         {
-            NotifyFilter = NotifyFilters.FileName | NotifyFilters.DirectoryName | NotifyFilters.LastWrite,
-            IncludeSubdirectories = false,
-            EnableRaisingEvents = true,
-        };
-        watcher.Changed += (_, _) => Signal();
-        watcher.Created += (_, _) => Signal();
-        watcher.Deleted += (_, _) => Signal();
-        watcher.Renamed += (_, _) => Signal();
-        _currentWatcher = watcher;
+            if (File.Exists(sockPath))
+                File.Delete(sockPath);
+        }
+        catch
+        {
+        }
     }
 
     static void WatchStamp()
@@ -92,8 +92,9 @@ public static class ThemeWatch
             _listenCancel = new CancellationTokenSource();
             _ = Task.Run(() => AcceptLoop(listener, _listenCancel.Token));
         }
-        catch
+        catch (Exception ex)
         {
+            App.Instance.SetLastError(ex.Message);
         }
     }
 
@@ -115,7 +116,7 @@ public static class ThemeWatch
             {
                 if (token.IsCancellationRequested)
                     return;
-                await Task.Delay(80, token);
+                await Task.Delay(DebounceMilliseconds, token);
             }
         }
     }
@@ -143,13 +144,14 @@ public static class ThemeWatch
         lock (Gate)
         {
             _debounce?.Cancel();
+            _debounce?.Dispose();
             _debounce = new CancellationTokenSource();
             var token = _debounce.Token;
             _ = Task.Run(async () =>
             {
                 try
                 {
-                    await Task.Delay(80, token);
+                    await Task.Delay(DebounceMilliseconds, token);
                     Post();
                 }
                 catch (TaskCanceledException)

@@ -5,6 +5,15 @@ using Qt.Quick;
 
 namespace Omarchy.Chroma;
 
+internal readonly record struct SessionCapture(
+    string ThemeName,
+    string WallpaperPath,
+    string IconTheme,
+    string FontName,
+    string QtDir,
+    string ColorsTomlPath,
+    bool HookInstalled);
+
 [QObject]
 [QmlElement(Name = "App", Singleton = true)]
 public sealed class App : INotifyPropertyChanged
@@ -66,17 +75,32 @@ public sealed class App : INotifyPropertyChanged
     }
 
     public void RefreshSession()
+        => ApplySession(CaptureSession());
+
+    public static SessionCapture CaptureSession()
     {
         var home = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
         var current = Path.Combine(home, ".local", "state", "omarchy", "current");
 
-        Assign(ref _themeName, ReadTrimmed(Path.Combine(current, "theme.name")), nameof(ThemeName));
-        Assign(ref _wallpaperPath, ResolveLink(Path.Combine(current, "background")), nameof(WallpaperPath));
-        Assign(ref _iconTheme, ReadIconTheme(), nameof(IconTheme));
-        Assign(ref _fontName, ReadFontName(), nameof(FontName));
-        Assign(ref _qtDir, Environment.GetEnvironmentVariable("QtDir") is { Length: > 0 } qtDir ? qtDir : "/usr", nameof(QtDir));
-        Assign(ref _colorsTomlPath, Path.Combine(current, "theme", "colors.toml"), nameof(ColorsTomlPath));
-        Assign(ref _hookInstalled, File.Exists(HookPath()), nameof(HookInstalled));
+        return new SessionCapture(
+            ReadTrimmed(Path.Combine(current, "theme.name")),
+            ResolveLink(Path.Combine(current, "background")),
+            ReadIconTheme(),
+            ReadFontName(),
+            Environment.GetEnvironmentVariable("QtDir") is { Length: > 0 } qtDir ? qtDir : "/usr",
+            Path.Combine(current, "theme", "colors.toml"),
+            File.Exists(HookPath()));
+    }
+
+    public void ApplySession(SessionCapture session)
+    {
+        Assign(ref _themeName, session.ThemeName, nameof(ThemeName));
+        Assign(ref _wallpaperPath, session.WallpaperPath, nameof(WallpaperPath));
+        Assign(ref _iconTheme, session.IconTheme, nameof(IconTheme));
+        Assign(ref _fontName, session.FontName, nameof(FontName));
+        Assign(ref _qtDir, session.QtDir, nameof(QtDir));
+        Assign(ref _colorsTomlPath, session.ColorsTomlPath, nameof(ColorsTomlPath));
+        Assign(ref _hookInstalled, session.HookInstalled, nameof(HookInstalled));
     }
 
     public void InstallHook()
