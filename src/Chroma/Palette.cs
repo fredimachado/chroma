@@ -233,7 +233,7 @@ public sealed class Palette : INotifyPropertyChanged
 
     Task PostApplyAsync((bool Ok, ThemeSnapshot Snapshot, string Error, SessionCapture Session) result)
     {
-        var tcs = new TaskCompletionSource();
+        var tcs = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
         var ui = _ui;
         if (ui is null)
         {

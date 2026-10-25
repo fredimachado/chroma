@@ -42,9 +42,13 @@ public static class ThemeWatch
         _listenCancel?.Cancel();
         _listenCancel?.Dispose();
         _listenCancel = null;
-        _debounce?.Cancel();
-        _debounce?.Dispose();
-        _debounce = null;
+        lock (Gate)
+        {
+            _debounce?.Cancel();
+            _debounce?.Dispose();
+            _debounce = null;
+            _onThemeSignal = null;
+        }
         _directoryMonitor?.Dispose();
         _directoryMonitor = null;
         _stampWatcher?.Dispose();
@@ -141,8 +145,14 @@ public static class ThemeWatch
 
     static void Signal()
     {
+        if (!_started)
+            return;
+
         lock (Gate)
         {
+            if (!_started)
+                return;
+
             _debounce?.Cancel();
             _debounce?.Dispose();
             _debounce = new CancellationTokenSource();
