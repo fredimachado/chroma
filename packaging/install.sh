@@ -35,16 +35,19 @@ resolve_build_dir() {
   fi
 
   local newest=""
-  while IFS= read -r -d '' dir; do
-    newest="$dir"
-  done < <(find "$search_root" -type d -path '*/net10.0' -print0 | sort -z)
+  newest="$(
+    find "$search_root" -type d -path '*/net10.0' -printf '%T@\t%p\n' 2>/dev/null \
+      | sort -t "$(printf '\t')" -k1,1nr \
+      | head -n1 \
+      | cut -f2-
+  )"
 
   if [[ -z "$newest" ]]; then
     echo "install.sh: no net10.0 output under ${search_root}; build first or pass BUILD_OUTPUT_DIR" >&2
     exit 1
   fi
 
-  newest
+  printf '%s\n' "$newest"
 }
 
 find_host_binary() {
