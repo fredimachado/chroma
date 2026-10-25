@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Text;
 
@@ -8,6 +9,7 @@ public readonly record struct ProcessRunResult(bool Ok, string StdOut, string St
 public static class ProcessRunner
 {
     public static TimeSpan DefaultTimeout => TimeSpan.FromSeconds(30);
+    static readonly TimeSpan PostKillWait = TimeSpan.FromSeconds(5);
 
     public static ProcessRunResult Run(
         string fileName,
@@ -54,7 +56,7 @@ public static class ProcessRunner
             {
                 timedOut = true;
                 TryKillTree(process);
-                process.WaitForExit();
+                process.WaitForExit((int)PostKillWait.TotalMilliseconds);
             }
 
             Task.WaitAll(stdoutTask, stderrTask);
@@ -81,6 +83,9 @@ public static class ProcessRunner
         catch (InvalidOperationException)
         {
         }
+        catch (Win32Exception)
+        {
+        }
         catch (NotSupportedException)
         {
             try
@@ -88,6 +93,9 @@ public static class ProcessRunner
                 process.Kill();
             }
             catch (InvalidOperationException)
+            {
+            }
+            catch (Win32Exception)
             {
             }
         }

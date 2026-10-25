@@ -3,10 +3,13 @@ namespace Omarchy.Chroma;
 public sealed class ThemeDirectoryMonitor : IDisposable
 {
     const int DebounceMilliseconds = 80;
+    const int AttachRetryInitialMilliseconds = 50;
+    const int AttachRetryMaxMilliseconds = 2000;
 
     readonly object _gate = new();
     readonly string _root;
     CancellationTokenSource? _debounceCts;
+    CancellationTokenSource? _attachRetryCts;
     FileSystemWatcher? _watcher;
     Action? _onChanged;
     bool _disposed;
@@ -28,58 +31,73 @@ public sealed class ThemeDirectoryMonitor : IDisposable
     public void Start(Action? onChanged = null)
     {
         ObjectDisposedException.ThrowIf(_disposed, this);
-        if (_started)
-            return;
+        lock (_gate)
+        {
+            if (_started)
+                return;
 
-        _onChanged = onChanged;
-        _started = true;
-        AttachWatcher();
+            _onChanged = onChanged;
+            _started = true;
+            AttachWatcher();
+        }
     }
 
     public void Stop()
     {
-        if (!_started)
-            return;
-
-        _started = false;
         lock (_gate)
         {
-            _debounceCts?.Cancel();
-            _debounceCts = null;
-        }
+            if (!_started)
+                return;
 
-        _watcher?.Dispose();
-        _watcher = null;
+            _started = false;
+            CancelAndDisposeDebounce();
+            CancelAttachRetry();
+            DisposeWatcher();
+        }
     }
 
     public void Dispose()
     {
-        if (_disposed)
-            return;
+        lock (_gate)
+        {
+            if (_disposed)
+                return;
 
-        _disposed = true;
-        Stop();
+            _disposed = true;
+            _started = false;
+            CancelAndDisposeDebounce();
+            CancelAttachRetry();
+            DisposeWatcher();
+        }
     }
 
     void AttachWatcher()
     {
-        _watcher?.Dispose();
-        _watcher = null;
+        if (!_started || _disposed)
+            return;
+
+        DisposeWatcher();
 
         if (!Directory.Exists(_root))
+        {
+            ScheduleAttachRetry();
             return;
+        }
+
+        CancelAttachRetry();
 
         var watcher = new FileSystemWatcher(_root)
         {
             NotifyFilter = NotifyFilters.FileName | NotifyFilters.DirectoryName | NotifyFilters.LastWrite,
             IncludeSubdirectories = true,
-            EnableRaisingEvents = true,
+            EnableRaisingEvents = false,
         };
 
         watcher.Changed += OnFileSystemEvent;
         watcher.Created += OnFileSystemEvent;
         watcher.Deleted += OnFileSystemEvent;
         watcher.Renamed += OnFileSystemEvent;
+        watcher.EnableRaisingEvents = true;
         _watcher = watcher;
     }
 
@@ -87,12 +105,12 @@ public sealed class ThemeDirectoryMonitor : IDisposable
 
     void ScheduleSignal()
     {
-        if (!_started || _disposed)
-            return;
-
         lock (_gate)
         {
-            _debounceCts?.Cancel();
+            if (!_started || _disposed)
+                return;
+
+            CancelAndDisposeDebounce();
             _debounceCts = new CancellationTokenSource();
             var token = _debounceCts.Token;
             _ = Task.Run(async () =>
@@ -100,21 +118,101 @@ public sealed class ThemeDirectoryMonitor : IDisposable
                 try
                 {
                     await Task.Delay(DebounceMilliseconds, token);
-                    if (_started && !_disposed)
-                    {
-                        AttachWatcher();
-                        RaiseChanged();
-                    }
                 }
                 catch (TaskCanceledException)
                 {
+                    return;
                 }
-            }, token);
+
+                var shouldRaise = false;
+                lock (_gate)
+                {
+                    if (!_started || _disposed)
+                        return;
+
+                    AttachWatcher();
+                    shouldRaise = true;
+                }
+
+                if (shouldRaise)
+                    RaiseChanged();
+            });
         }
+    }
+
+    void ScheduleAttachRetry()
+    {
+        if (!_started || _disposed || _attachRetryCts is not null)
+            return;
+
+        _attachRetryCts = new CancellationTokenSource();
+        var token = _attachRetryCts.Token;
+        _ = Task.Run(async () =>
+        {
+            var delayMs = AttachRetryInitialMilliseconds;
+            while (!token.IsCancellationRequested)
+            {
+                try
+                {
+                    await Task.Delay(delayMs, token);
+                }
+                catch (TaskCanceledException)
+                {
+                    return;
+                }
+
+                lock (_gate)
+                {
+                    if (token.IsCancellationRequested || !_started || _disposed)
+                        return;
+
+                    if (_watcher is not null)
+                        return;
+
+                    if (!Directory.Exists(_root))
+                    {
+                        delayMs = Math.Min(delayMs * 2, AttachRetryMaxMilliseconds);
+                        continue;
+                    }
+
+                    AttachWatcher();
+                    return;
+                }
+            }
+        });
+    }
+
+    void CancelAttachRetry()
+    {
+        if (_attachRetryCts is null)
+            return;
+
+        _attachRetryCts.Cancel();
+        _attachRetryCts.Dispose();
+        _attachRetryCts = null;
+    }
+
+    void CancelAndDisposeDebounce()
+    {
+        if (_debounceCts is null)
+            return;
+
+        _debounceCts.Cancel();
+        _debounceCts.Dispose();
+        _debounceCts = null;
+    }
+
+    void DisposeWatcher()
+    {
+        _watcher?.Dispose();
+        _watcher = null;
     }
 
     void RaiseChanged()
     {
+        if (!_started || _disposed)
+            return;
+
         _onChanged?.Invoke();
         Changed?.Invoke();
     }
